@@ -1,0 +1,21 @@
+{% extends "skeleton.html" %}
+
+{% block title "Visit FEDD" %}
+
+{% block body %}
+
+    <div class="announcement">
+        <p>
+            This year's Freshman Engineering Design Day will be held on<br>
+            <strong>{{ feddDate(year)|date('l, F j, Y') }}</strong><br> at the
+            <a href="http://www.engr.ncsu.edu/maps/building/MCK">McKimmon
+            Center</a>.
+        </p>
+
+        <p>
+            <a href="http://www.engr.ncsu.edu/firstyear/fedd/">More Info &raquo;</a>
+        </p>
+    </div>
+
+{% endblock body %}
+

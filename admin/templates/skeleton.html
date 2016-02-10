@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>FEDD :: {% block title "Scoreboard" %}</title>
+        <link rel="stylesheet" type="text/css" href="/firstyear/competition/css/{{ mobile ? 'mobile' : 'desktop' }}.css">
+        {% block styles %}{% endblock styles %}
+    </head>
+    <body>
+        <div id="shell">
+            <h1>{% block header %}Freshman Engineering Design Day{% endblock header %}</h1>
+
+            {% block body %}
+
+            {% endblock body %}
+        </div>
+
+        {% if DEBUG %}
+        {% set log = getDebugLog() %}
+        {% if log %}
+        <dl class="debug-log" style="display: none;">
+            {% for message in log %}
+            <dt>{{ message.title }}</dt>
+            <dd><pre>{{ message.data }}</pre></dd>
+            {% endfor %}
+        </dl>
+        {% endif %}
+        {% endif %}
+
+        {% block scripts %}
+        {% endblock scripts %}
+    </body>
+</html>

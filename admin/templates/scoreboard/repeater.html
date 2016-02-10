@@ -1,0 +1,43 @@
+{% extends "skeleton.html" %}
+{% from "scoreboard/helpers.html" import competitiondiv %}
+
+{% block title "Live Scores" %}
+
+{% block scripts %}
+    {% if not mobile and autoreload %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="js/jquery.cycle.all.js"></script>
+        <script>
+            $(function () {
+                {% if competitions|length < 2 %}
+                setTimeout(function () { location.reload(); }, 10000);
+                {% else %}
+                $("#competitions").cycle({
+                    fx:         'fade',
+                    timeout:    10000,
+                    sync:       false,
+                    autostop:   true,
+                    end:        function () { location.reload(); }
+                });
+                {% endif %}
+            });
+        </script>
+    {% endif %}
+{% endblock scripts %}
+
+{% block body %}
+
+    <p id="date">Live Scores for Fall {{ year }}</p>
+
+    <div id="competitions">
+        {% for competition in competitions %}
+        {{ competitiondiv(competition) }}
+        {% else %}
+        <div class="announcement">
+            Welcome to FEDD!
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock body %}
+
