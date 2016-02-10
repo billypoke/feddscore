@@ -1,0 +1,43 @@
+{% extends "skeleton.html" %}
+{% from "scoreboard/helpers.html" import competitiondiv %}
+
+{% block title "Final Scores" %}
+
+{% block scripts %}
+    {% if collapse %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script>
+            $(function () {
+                $('.nonplacers').hide();
+                $('.show-link').show();
+            });
+            var expandScores = function (id) {
+                $('#competition-' + id + ' .show-link').hide();
+                $('#competition-' + id + ' .nonplacers').show(500);
+                $('#competition-' + id + ' .hide-link').show();
+            }
+            var collapseScores = function (id) {
+                $('#competition-' + id + ' .hide-link').hide();
+                $('#competition-' + id + ' .nonplacers').hide(500);
+                $('#competition-' + id + ' .show-link').show();
+            }
+        </script>
+    {% endif %}
+{% endblock scripts %}
+
+{% block body %}
+
+    <p id="date">Final Scores for Fall {{ year }}</p>
+
+    <div id="competitions">
+        {% for competition in competitions %}
+        {{ competitiondiv(competition, collapse) }}
+        {% else %}
+        <div class="announcement">
+            No event scores have been finalized yet. Keep checking back!
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock body %}
+
