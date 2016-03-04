@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>FEDD :: {% block title "Scoreboard" %}</title>
+        <link rel="stylesheet" type="text/css" href="public/css/{{ mobile ? 'mobile' : 'desktop' }}.css">
+        {% block styles %}{% endblock styles %}
+    </head>
+    <body>
+        <div id="shell">
+            <h1>{% block header %}Freshman Engineering Design Day{% endblock header %}</h1>
+
+            {% block body %}
+
+            {% endblock body %}
+        </div>
+
+        {% block scripts %}
+        {% endblock scripts %}
+    </body>
+</html>

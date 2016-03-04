@@ -1,0 +1,63 @@
+{% macro competitiondiv (competition, collapse) %}
+    <div class="competition" id="competition-{{ competition.id }}">
+
+        <h2>{{ competition.name }} &ndash; {{ competition.ampm == "am" ? "Morning" : "Afternoon" }}</h2>
+
+        <table class="scores">
+            <tbody>
+                {% for team in competition.teams %}
+                <tr id="team-{{ team.id }}"{% if not team.place %} class="nonplacing"{% endif %}>
+                    <td class="place">{{ _self.placeicon(team.place) }}</td>
+                    <td class="teamname">{{ team.name }}</td>
+                    <td class="score">{% if team.disqualified %}&bull;{% endif %} {% if team.score is null %}&mdash;{% else %}{{ team.score }}{% endif %}</td>
+                </tr>
+                {% if collapse and team.place and not competition.teams[loop.index0 + 1].place %}
+            </tbody>
+            <tbody class="nonplacers">
+                {% endif %}
+                {% else %}
+                <tr>
+                    <td class="announcement" colspan="3">
+                        We do not have any scores from this competition yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if collapse %}
+        <p class="show-link control" style="display: none;">
+            <a href="#" onclick="expandScores({{ competition.id }}); return false;">Show All Scores</a>
+        </p>
+        <p class="hide-link control" style="display: none;">
+            <a href="#" onclick="collapseScores({{ competition.id }}); return false;">Hide Non-Placing Scores</a>
+        </p>
+        {% endif %}
+
+    </div>
+{% endmacro %}
+
+
+{% macro placeicon (place) %}
+    {% if mobile %}
+        {% if place == "first" %}
+            <span class="first">1</span>
+        {% elseif place == "second" %}
+            <span class="second">2</span>
+        {% elseif place == "third" %}
+            <span class="third">3</span>
+        {% elseif place == "honorable" %}
+            <span class="honorable">HM</span>
+        {% endif %}
+    {% else %}
+        {% if place == "first" %}
+            <img src="public/img/ribbon1_blue.png" alt="First Place" title="First Place">
+        {% elseif place == "second" %}
+            <img src="public/img/ribbon2_red.png" alt="Second Place" title="Second Place">
+        {% elseif place == "third" %}
+            <img src="public/img/ribbon3_white.png" alt="Third Place" title="Third Place">
+        {% elseif place == "honorable" %}
+            <img src="public/img/ribbonH_green.png" alt="Honorable Mention" title="Honorable Mention">
+        {% endif %}
+    {% endif %}
+{% endmacro %}

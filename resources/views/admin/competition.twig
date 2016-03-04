@@ -1,0 +1,129 @@
+{% extends "admin/skeleton.html" %}
+{% from "scoreboard/helpers.html" import competitiondiv %}
+
+{% block title competition.name %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        var changesMade = false;
+        var triggerChange = function () {
+            if (!changesMade) {
+                $(".flashes").hide();
+                $("#changes-not-saved").show();
+                changesMade = true;
+            }
+        }
+        var onSave = function () {
+            changesMade = false;
+            return true;
+        }
+        var checkUnload = function (e) {
+            e = e || window.event;
+            if (changesMade) {
+                var warning = "Your changes have not been saved! " +
+                              "Are you sure that you want to leave?";
+                if (e) {
+                    e.returnValue = warning;
+                }
+                return warning;
+            }
+        }
+        window.onbeforeunload = checkUnload;
+        $(".teaminput").change(triggerChange);
+        $("#save-button").click(onSave);
+    </script>
+{% endblock scripts %}
+
+{% block content %}
+
+    <h2>{{ competition.name }} &ndash; {{ competition.ampm|upper }}</h2>
+
+    <p id="changes-not-saved" style="display: none;">
+        <strong>Your changes have not been saved!</strong> Click the
+        <b>Save</b> button to save them.
+    </p>
+
+    <form action="" method="POST">
+
+        <table id="teams">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Score</th>
+                    <th>DQ?</th>
+                    <th colspan="2">Place</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in competition.teams %}
+                <tr>
+                    <td>
+                        <input type="text" name="update[{{ team.id }}][name]"
+                               maxlength="64" value="{{ team.name }}"
+                               class="teaminput" tabindex="{{ loop.index }}">
+                    </td>
+                    <td>
+                        <input type="text" name="update[{{ team.id }}][score]"
+                               maxlength="4" value="{{ team.score }}"
+                               class="teaminput" tabindex="{{ loop.length + loop.index }}">
+                    </td>
+                    <td>
+                        <input type="checkbox" name="update[{{ team.id }}][dq]"
+                               value="yes" {% if team.disqualified %}checked{% endif %}
+                               class="teaminput"
+                               tabindex="{{ 2 * loop.length + loop.index }}">
+                    </td>
+                    <td>
+                        <select name="update[{{ team.id }}][place]" class="teaminput"
+                                tabindex="{{ 3 * loop.length + loop.index }}">
+                            <option value="" {% if team.place is null %}selected{% endif %}>
+                                &mdash;
+                            </option>
+                            <option value="first" {% if team.place == "first" %}selected{% endif %}>
+                                1st
+                            </option>
+                            <option value="second" {% if team.place == "second" %}selected{% endif %}>
+                                2nd
+                            </option>
+                            <option value="third" {% if team.place == "third" %}selected{% endif %}>
+                                3rd
+                            </option>
+                            <option value="honorable" {% if team.place == "honorable" %}selected{% endif %}>
+                                HM
+                            </option>
+                        </select>
+                    </td>
+                    <td style="padding-left: 5em;">
+                        <button type="submit" name="delete" value="{{ team.id }}" tabindex="-5" onclick="return confirm({{ ("Do you really want to delete " ~ team.name ~ "?")|json_encode }});">Del</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <button id="save-button" name="action" type="submit" value="save">
+                            Save
+                        </button>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+
+    </form>
+
+    <h2>Add Teams</h2>
+
+    <form action="" method="POST">
+
+        <p>Enter team names in this text area, one per line.</p>
+
+        <p><textarea name="names" rows="10" cols="64"></textarea></p>
+
+        <p><button type="submit" name="action" value="add">Add Teams</button></p>
+
+    </form>
+
+{% endblock content %}
+
