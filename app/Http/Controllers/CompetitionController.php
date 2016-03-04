@@ -12,28 +12,45 @@ use FeddScore\Competition;
 
 class CompetitionController extends Controller
 {
+    /**
+     * @var string the year to use for a request
+     */
     private static $year;
 
+    /**
+     * @var array Given the first day of November, what day is Thanksgiving on
+     */
     private static $FOURTH_THURSDAYS = array(
         // if the first day of November is a <blank>, Thanksgiving is on...
         'Sun' => 26,    'Mon' => 25,    'Tue' => 24,    'Wed' => 23,
         'Thu' => 22,    'Fri' => 28,    'Sat' => 29
     );
 
+    /**
+     * If the self::$year variable has been set (via a $_GET parameter in getIndex() probably),
+     * calculate the day of FEDD for that year
+     *
+     * Otherwise, calculate the day of FEDD fot eh current year
+     *
+     * @return \DateTime The day that FEDD will be held on
+     */
     private static function getFeddDate()
     {
         // Have we been passed a year?
-        $year = isset(self::$year) ? self::$year : date('Y');
+        $year = self::$year;
 
-        // If we just generated the current year, store it, otherwise overwrite the year with itself
-        self::$year = $year;
-
-        // mktime(hour,minute,second,month,day,year,[is_dst]);
+        // mktime(hour,minute,second,month,day,year[, is_dst]);
         $november1Weekday = date('D', mktime(0, 0, 0, 11, 1, $year));
         $day = self::$FOURTH_THURSDAYS[$november1Weekday] - 2;
         return \DateTime::createFromFormat('Y-m-d', "$year-11-$day");
     }
 
+    /**
+     * The mode to run in will be determined based on the current date and the year specified either by a $_GET
+     * parameter in getIndex(), or in getFeddDate() as the current year
+     *
+     * @return string the mode the app should run in
+     */
     private static function getMode()
     {
         $feddDate = self::getFeddDate();
@@ -55,10 +72,17 @@ class CompetitionController extends Controller
         return $mode;
     }
 
+    /**
+     * If the $_GET parameters 'year' or 'mode' are specified, use those, otherwise, use the defaults.
+     * Then load the corresponding view
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View the view to show based on mode and year
+     */
     public static function getIndex()
     {
+        // Grab the $_GET params, if there are any
         $request = Request::capture();
-        self::$year = $request->has('year') ? $request->input('year') : null;
+        self::$year = $request->has('year') ? $request->input('year') : date('Y');
         $mode = $request->has('mode') ? $request->input('mode') : self::getMode();
 
         switch ($mode) {
@@ -83,6 +107,10 @@ class CompetitionController extends Controller
         }
     }
 
+    /**
+     * @param $year string the year to show the repeater view for
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View the repeater view to be rendered by Twig
+     */
     public static function repeater ($year) {
         $competitions = self::getCompetitions($year, 'active', FALSE);
 
@@ -94,18 +122,26 @@ class CompetitionController extends Controller
 
     }
 
+    /**
+     * @param $year string the year to show the final-scores view with non-placing scores shown
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View the repeater view to be rendered by Twig
+     */
     public static function finalScores ($year) {
         $competitions = self::getCompetitions($year, 'final');
 
         return view('scoreboard/final-scores', [
             'year' => $year,
-            'collapse' => TRUE,
+            'collapse' => FALSE,
             'competitions' => $competitions
         ]);
     }
 
+    /**
+     * @param $year string the year to show the final-scores view with non-placing scores hidden
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View the repeater view to be rendered by Twig
+     */
     public static function hallOfFame ($year) {
-        $year = $year - 1;
+        $year = strval(intval($year) - 1);
         $competitions = self::getCompetitions($year, 'final');
 
         return view('scoreboard/final-scores', [
@@ -115,6 +151,16 @@ class CompetitionController extends Controller
         ]);
     }
 
+    /**
+     * Select all competitions for a specified additional chunk $rest and bindings $bindings
+     *
+     * TODO Only called by getCompetitions
+     * TODO Can we merge the two methods?
+     *
+     * @param $rest     string  any additional constraints or sorting to be applied to the statement
+     * @param $bindings array   bindings for any wildcards or user input
+     * @return          array   an array of competitions that match the year and status specified
+     */
     public static function selectCompetitions ($rest, $bindings)
     {
         $stmt = DB::select(
@@ -154,6 +200,14 @@ class CompetitionController extends Controller
         return $comps;
     }
 
+    /**
+     * Get all competitions for a given year, status, and $byPlace sorting boolean
+     *
+     * @param $year                 string the year to get competitions for
+     * @param $status               string the status of the competitions to get (waiting, active, final)
+     * @param bool|TRUE $byPlace
+     * @return array
+     */
     public static function getCompetitions ($year, $status, $byPlace = TRUE) {
         return self::selectCompetitions(
             "WHERE competitions.year = :year AND competitions.status = :status " .
@@ -163,7 +217,15 @@ class CompetitionController extends Controller
         );
     }
 
+    /**
+     * Get a competition from its id
+     *
+     * @param $id
+     * @return mixed
+     */
     public static function getCompetition ($id) {
-        return DB::table('competitions')->where('id', $id);
+        return DB::table('competitions')
+            ->where('id', $id)
+            ->orderBy('name', 'asc');
     }
 }
