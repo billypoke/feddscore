@@ -99,7 +99,7 @@ class CompetitionController extends Controller
                 break;
 
             case "advert":
-                return view('scoreboard/advertisement', ['year' => self::$year, 'date' => self::getFeddDate()->format('Y-m-d')]);
+                return view('scoreboard/advertisement', ['date' => self::getFeddDate()->format('Y-m-d')]);
 
             default:
                 echo "what the heck?";
