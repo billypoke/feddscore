@@ -1,9 +1,7 @@
-@import url(http://fonts.googleapis.com/css?family=Open+Sans);
-
 body
 {
     background: #fff;
-    font-family: "Open Sans", "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-family: UniversLight;
 }
 
 #shell
@@ -23,7 +21,7 @@ h1
 {
     font-weight: normal;
     font-size: 2.4em;
-    font-family: Georgia, serif;
+    font-family: UniversRoman;
     color: #a00;
     text-align: center;
 }

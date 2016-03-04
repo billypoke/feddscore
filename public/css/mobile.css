@@ -2,14 +2,14 @@
 {
     width: 97%;
     font-size: 1.5em;
-    font-family: "Helvetica Neue", "Droid Sans", Arial, Helvetica, sans-serif;
+    font-family: UniversLight;
     padding: 10px;
 }
 
 h1
 {
     font-size: 2em;
-    font-family: Georgia, serif;
+    font-family: UniversRoman;
     color: #a00;
     margin-bottom: 5px;
     text-align: center;
