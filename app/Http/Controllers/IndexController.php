@@ -31,26 +31,56 @@ class IndexController extends Controller
         return \DateTime::createFromFormat('Y-m-d', "$year-11-$feddDay");
     }
 
+    /**
+     * The mode to run in will be determined based on the current date and the year specified either by a $_GET
+     * parameter in getIndex(), or in getFeddDate() as the current year
+     *
+     * @param \DateTime $date
+     * @param \DateTime $feddDay
+     * @return string the mode the app should run in
+     */
+    private static function getMode($date, $feddDay)
+    {
+        $competitionCount = Competition::where('year', $date->format('Y'))->count();
+
+        if ($competitionCount > 0) {
+            if ($feddDay == $date) {
+                $mode = 'repeater';
+            } elseif ($date > $feddDay) {
+                $mode = 'final';
+            } elseif ($date < $feddDay) {
+                $mode = 'advert';
+            }
+        } else {
+            $mode = 'halloffame';
+        }
+
+        return $mode;
+    }
+
     public static function getIndex(\DateTime $date)
     {
         $year = $date->format('Y');
         $feddDay = self::getFeddDate($year);
 
-        $numCompetitions = Competition::where('year', $year)->count();
+        $mode = self::getMode($date, $feddDay);
 
-        if ($numCompetitions > 0) {
-            if ($date < $feddDay) {
-                return self::showAdvert($year);
-            } elseif ($date == $feddDay) {
+        switch ($mode) {
+            case "repeater":
                 return self::showRepeater($year);
-            } elseif ($date > $feddDay) {
-                return self::showFinal($year);
-            }
-        } else {
-            return self::showHallOfFame($year);
-        }
 
-        return self::showErrorPage();
+            case "final":
+                return self::showFinal($year);
+
+            case "halloffame":
+                return self::showHallOfFame($year);
+
+            case "advert":
+                return self::showAdvert($year);
+
+            default:
+                return self::showErrorPage();
+        }
     }
 
     public static function showAdvert($year)
@@ -61,7 +91,7 @@ class IndexController extends Controller
     public static function showRepeater($year)
     {
         $competitions = Competition::where('year', $year)
-                            ->where('status', 'active');
+            ->where('status', 'active')->get();
 
         return view('scoreboard/repeater',[
             'year' => $year,
@@ -72,8 +102,12 @@ class IndexController extends Controller
 
     public static function showFinal($year)
     {
+
         $competitions = Competition::where('year', $year)
-                            ->where('status', 'final');
+            ->where('status', 'final')
+            ->orderBy('ampm', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
 
         return view('scoreboard/final-scores', [
             'year' => $year,
@@ -84,12 +118,15 @@ class IndexController extends Controller
 
     public static function showHallOfFame($year)
     {
-        $competitions = Competition::where('year', $year - 1)
-                            ->where('status', 'final');
+        $competitions = Competition::where('year', $year-1)
+            ->where('status', 'final')
+            ->orderBy('ampm', 'asc')
+            ->orderBy('name', 'asc')
+            ->get();
 
         return view('scoreboard/final-scores', [
             'year' => $year-1,
-            'collapse' => false,
+            'collapse' => true,
             'competitions' => $competitions
         ]);
     }

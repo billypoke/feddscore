@@ -12,6 +12,9 @@ class Competition extends Model
 
     public function teams()
     {
-        return $this->hasMany('FeddScore\Team');
+        return $this
+            ->hasMany('FeddScore\Team')
+            ->orderBy('teams.place', 'desc')
+            ->orderBy('teams.score', 'desc');
     }
 }
