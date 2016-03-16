@@ -2,15 +2,18 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <title>FEDD :: {% block title "Scoreboard" %}</title>
-        <link rel="stylesheet" type="text/css" href="public/css/{{ mobile ? 'mobile' : 'desktop' }}.css">
+        <link rel="stylesheet" type="text/css" href="public/css/app.css">
         <link href="https://cdn.ncsu.edu/brand-assets/fonts/include.css" rel="stylesheet" type="text/css" />
 
         <script src="https://cdn.ncsu.edu/brand-assets/utility-bar/ub.php?placeholder=search ncsu.edu&maxWidth=1100&color=gray"></script>
         {% block styles %}{% endblock styles %}
     </head>
     <body>
-        <div id="shell">
+        <div id="content" class="container">
             <h1>{% block header %}Freshman Engineering Design Day{% endblock header %}</h1>
 
             {% block body %}

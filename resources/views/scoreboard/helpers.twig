@@ -27,10 +27,10 @@
 
         {% if collapse %}
         <p class="show-link control" style="display: none;">
-            <a href="#" onclick="expandScores({{ competition.id }}); return false;">Show All Scores</a>
+            <a href="#" class="showScore" onclick="expandScores({{ competition.id }}); return false;">Show All Scores</a>
         </p>
         <p class="hide-link control" style="display: none;">
-            <a href="#" onclick="collapseScores({{ competition.id }}); return false;">Hide Non-Placing Scores</a>
+            <a href="#" class="showScore" onclick="collapseScores({{ competition.id }}); return false;">Hide Non-Placing Scores</a>
         </p>
         {% endif %}
 
