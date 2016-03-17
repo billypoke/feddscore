@@ -2,12 +2,9 @@
 
 namespace FeddScore\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use FeddScore\Http\Requests;
-use FeddScore\Http\Controllers\Controller;
-
 use FeddScore\Competition;
+use FeddScore\Http\Requests;
+use Illuminate\Support\Facades\Input;
 
 class IndexController extends Controller
 {
@@ -24,6 +21,12 @@ class IndexController extends Controller
         'Sat' => 29
     );
 
+    /**
+     * Calculates the day of FEDD for a specified year
+     *
+     * @param $year         int     The year to calculate the day of FEDD for
+     * @return \DateTime            The date of FEDD for the year input
+     */
     private static function getFeddDate($year)
     {
         $november1Weekday = date('D', mktime(0, 0, 0, 11, 1, $year));
@@ -58,9 +61,25 @@ class IndexController extends Controller
         return $mode;
     }
 
+    /**
+     * Determines mode to run in and returns view to display, based on the current date
+     *
+     * Also allows setting of debug parameters:
+     *      @var $debugDate \DateTime
+     *      @var $debugYear string
+     * to override the auto-generated values
+     *
+     * @param \DateTime $date   The current date
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public static function getIndex(\DateTime $date)
     {
-        $year = $date->format('Y');
+        $debugDate = Input::get('date');
+        $debugYear = Input::get('year');
+
+        $date = isset($debugDate) ? \DateTime::createFromFormat('Y-m-d', $debugDate) : $date;
+        $year = isset($debugYear) ? $debugYear : $date->format('Y');
+
         $feddDay = self::getFeddDate($year);
 
         $mode = self::getMode($date, $feddDay);
@@ -83,11 +102,23 @@ class IndexController extends Controller
         }
     }
 
+    /**
+     * return the advertisement view
+     *
+     * @param $year
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public static function showAdvert($year)
     {
         return view('scoreboard/advertisement', ['date' => self::getFeddDate($year)->format('Y-m-d')]);
     }
 
+    /**
+     * return the live repeater view
+     *
+     * @param $year
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public static function showRepeater($year)
     {
         $competitions = Competition::where('year', $year)
@@ -100,6 +131,12 @@ class IndexController extends Controller
         ]);
     }
 
+    /**
+     * return the final score view
+     *
+     * @param $year
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public static function showFinal($year)
     {
 
@@ -116,6 +153,12 @@ class IndexController extends Controller
         ]);
     }
 
+    /**
+     * return the hall of fame view
+     *
+     * @param $year
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public static function showHallOfFame($year)
     {
         $competitions = Competition::where('year', $year-1)

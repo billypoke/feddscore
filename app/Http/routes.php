@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return \FeddScore\Http\Controllers\CompetitionController::getIndex();
+    return \FeddScore\Http\Controllers\IndexController::getIndex(new DateTime());
 });
 
 /*
