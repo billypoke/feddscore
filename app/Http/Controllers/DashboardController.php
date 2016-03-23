@@ -11,7 +11,7 @@ class DashboardController extends Controller
     /**
      * @var array Given the first day of november, the day thanksgiving is on.
      */
-    private static $thanksgiving = array(
+    private $thanksgiving = array(
         'Sun' => 26,
         'Mon' => 25,
         'Tue' => 24,
@@ -27,10 +27,10 @@ class DashboardController extends Controller
      * @param $year         int     The year to calculate the day of FEDD for
      * @return \DateTime            The date of FEDD for the year input
      */
-    private static function getFeddDate($year)
+    private function getFeddDate($year)
     {
         $november1Weekday = date('D', mktime(0, 0, 0, 11, 1, $year));
-        $feddDay = self::$thanksgiving[$november1Weekday] - 2;
+        $feddDay = $this->thanksgiving[$november1Weekday] - 2;
         return \DateTime::createFromFormat('Y-m-d', "$year-11-$feddDay");
     }
 
@@ -42,7 +42,7 @@ class DashboardController extends Controller
      * @param \DateTime $feddDay
      * @return string the mode the app should run in
      */
-    private static function getMode($date, $feddDay)
+    private function getMode($date, $feddDay)
     {
         $competitionCount = Competition::where('year', $date->format('Y'))->count();
 
@@ -71,33 +71,33 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function getCurrent($year = null, $mode = null)
+    public function getCurrent($year = null)
     {
         $currentDate = new \DateTime();
 
         $debugDate = Input::get('date');
 
         $date = isset($debugDate) ? \DateTime::createFromFormat('Y-m-d', $debugDate) : $currentDate;
-        $year = isset($year) ? $year : $currentDate->format('Y');
+        $year = isset($year) && is_int($year) ? $year : $currentDate->format('Y');
 
-        $feddDay = self::getFeddDate($year);
-        $mode = isset($mode) ? $mode : self::getMode($date, $feddDay);
+        $feddDay = $this->getFeddDate($year);
+        $mode = $this->getMode($date, $feddDay);
 
         switch ($mode) {
             case "repeater":
-                return self::showRepeater($year);
+                return $this->showRepeater($year);
 
             case "final":
-                return self::showFinal($year);
+                return $this->showFinal($year);
 
             case "halloffame":
-                return self::showHallOfFame($year);
+                return $this->showHallOfFame($year);
 
             case "advert":
-                return self::showAdvert($year);
+                return $this->getAdvert($year);
 
             default:
-                return self::showErrorPage();
+                return $this->showErrorPage();
         }
     }
 
@@ -107,9 +107,9 @@ class DashboardController extends Controller
      * @param $year
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public static function showAdvert($year)
+    public function getAdvert($year)
     {
-        return view('scoreboard/advertisement', ['date' => self::getFeddDate($year)->format('Y-m-d')]);
+        return view('scoreboard/advertisement', ['date' => $this->getFeddDate($year)->format('Y-m-d')]);
     }
 
     /**
@@ -118,7 +118,7 @@ class DashboardController extends Controller
      * @param $year
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public static function showRepeater($year)
+    public function getRepeater($year)
     {
         $competitions = Competition::where('year', $year)
             ->where('status', 'active')->get();
@@ -136,9 +136,8 @@ class DashboardController extends Controller
      * @param $year
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public static function showFinal($year)
+    public function getFinal($year)
     {
-
         $competitions = Competition::where('year', $year)
             ->where('status', 'final')
             ->orderBy('ampm', 'asc')
@@ -158,7 +157,7 @@ class DashboardController extends Controller
      * @param $year
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public static function showHallOfFame($year)
+    public function getHallOfFame($year)
     {
         $competitions = Competition::where('year', $year-1)
             ->where('status', 'final')
@@ -173,7 +172,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    public static function showErrorPage()
+    public function showErrorPage()
     {
         return view('error');
     }

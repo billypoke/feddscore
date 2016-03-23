@@ -23,8 +23,16 @@
 */
 
 Route::group(['middleware' => ['web']], function () {
-    Route::get('/dashboard/{year?}/{mode?}', [
-        'as' => 'dashboard',
-        'uses' => 'DashboardController@getCurrent'
-    ]);
+    Route::group(['prefix' => 'dashboard/{year?}'], function() {
+        Route::get('/', [
+            'as' => 'dashboard',
+            'uses' => 'DashboardController@getCurrent'
+        ]);
+
+        # /dashboard/2016/advert
+        Route::get('advert', ['as' => 'dashboard.advert', 'uses' => 'DashboardController@getAdvert']);
+        Route::get('repeater', ['as' => 'dashboard.repeater', 'uses' => 'DashboardController@getRepeater']);
+        Route::get('final', ['as' => 'dashboard.final', 'uses' => 'DashboardController@getFinal']);
+        Route::get('hall-of-fame', ['as' => 'dashboard.hof', 'uses' => 'DashboardController@getHallOfFame']);
+    });
 });
