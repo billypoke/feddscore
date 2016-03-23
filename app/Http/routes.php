@@ -11,10 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return \FeddScore\Http\Controllers\IndexController::getIndex(new DateTime());
-});
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -27,5 +23,7 @@ Route::get('/', function () {
 */
 
 Route::group(['middleware' => ['web']], function () {
-    //
+    Route::get('/', function () {
+        return \FeddScore\Http\Controllers\IndexController::getIndex(new DateTime());
+    });
 });
