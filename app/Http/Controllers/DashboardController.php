@@ -3,62 +3,18 @@
 namespace FeddScore\Http\Controllers;
 
 use FeddScore\Competition;
+use FeddScore\DesignDay;
 use FeddScore\Http\Requests;
 use Illuminate\Support\Facades\Input;
 
 class DashboardController extends Controller
 {
     /**
-     * @var array Given the first day of november, the day thanksgiving is on.
+     * @return DesignDay
      */
-    private $thanksgiving = array(
-        'Sun' => 26,
-        'Mon' => 25,
-        'Tue' => 24,
-        'Wed' => 23,
-        'Thu' => 22,
-        'Fri' => 28,
-        'Sat' => 29
-    );
-
-    /**
-     * Calculates the day of FEDD for a specified year
-     *
-     * @param $year         int     The year to calculate the day of FEDD for
-     * @return \DateTime            The date of FEDD for the year input
-     */
-    private function getFeddDate($year)
+    private function getFeddDate()
     {
-        $november1Weekday = date('D', mktime(0, 0, 0, 11, 1, $year));
-        $feddDay = $this->thanksgiving[$november1Weekday] - 2;
-        return \DateTime::createFromFormat('Y-m-d', "$year-11-$feddDay");
-    }
-
-    /**
-     * The mode to run in will be determined based on the current date and the year specified either by a $_GET
-     * parameter in getIndex(), or in getFeddDate() as the current year
-     *
-     * @param \DateTime $date
-     * @param \DateTime $feddDay
-     * @return string the mode the app should run in
-     */
-    private function getMode($date, $feddDay)
-    {
-        $competitionCount = Competition::where('year', $date->format('Y'))->count();
-
-        if ($competitionCount > 0) {
-            if ($feddDay == $date) {
-                $mode = 'repeater';
-            } elseif ($date > $feddDay) {
-                $mode = 'final';
-            } elseif ($date < $feddDay) {
-                $mode = 'advert';
-            }
-        } else {
-            $mode = 'halloffame';
-        }
-
-        return $mode;
+        return app(DesignDay::class);
     }
 
     /**
@@ -73,31 +29,21 @@ class DashboardController extends Controller
      */
     public function getCurrent($year = null)
     {
-        $currentDate = new \DateTime();
+        $designDay = $this->getFeddDate();
 
-        $debugDate = Input::get('date');
+        $year = isset($year) && is_int($year) ? $year : $designDay->today()->format('Y');
+        $competitionCount = Competition::where('year', $designDay->today()->format('Y'))->count();
 
-        $date = isset($debugDate) ? \DateTime::createFromFormat('Y-m-d', $debugDate) : $currentDate;
-        $year = isset($year) && is_int($year) ? $year : $currentDate->format('Y');
-
-        $feddDay = $this->getFeddDate($year);
-        $mode = $this->getMode($date, $feddDay);
-
-        switch ($mode) {
-            case "repeater":
-                return $this->showRepeater($year);
-
-            case "final":
-                return $this->showFinal($year);
-
-            case "halloffame":
-                return $this->showHallOfFame($year);
-
-            case "advert":
+        if ($competitionCount > 0) {
+            if ($designDay->isHappening()) {
+                return $this->getRepeater($year);
+            } elseif ($designDay->hasHappened()) {
+                return $this->getFinal($year);
+            } else {
                 return $this->getAdvert($year);
-
-            default:
-                return $this->showErrorPage();
+            }
+        } else {
+            return $this->getHallOfFame($year);
         }
     }
 
@@ -109,7 +55,7 @@ class DashboardController extends Controller
      */
     public function getAdvert($year)
     {
-        return view('scoreboard/advertisement', ['date' => $this->getFeddDate($year)->format('Y-m-d')]);
+        return view('scoreboard/advertisement', ['date' => $this->getFeddDate()->next()->format('Y-m-d')]);
     }
 
     /**

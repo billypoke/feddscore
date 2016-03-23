@@ -2,6 +2,8 @@
 
 namespace FeddScore\Providers;
 
+use DateTime;
+use FeddScore\DesignDay;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(DesignDay::class, function ($app) {
+            return new DesignDay(new DateTime());
+        });
     }
 }

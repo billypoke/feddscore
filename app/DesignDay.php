@@ -35,6 +35,14 @@ class DesignDay
     }
 
     /**
+     * @return bool true if the compeition is happening now. Otherwise, false.
+     */
+    public function isHappening()
+    {
+        return $this->current == $this->current();
+    }
+
+    /**
      * Return the next date Design Day occurs on after current.
      * @return DateTime
      */
@@ -47,5 +55,13 @@ class DesignDay
         }
 
         return $this->current();
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function today()
+    {
+        return $this->current;
     }
 }
