@@ -6,7 +6,7 @@ use FeddScore\Competition;
 use FeddScore\Http\Requests;
 use Illuminate\Support\Facades\Input;
 
-class IndexController extends Controller
+class DashboardController extends Controller
 {
     /**
      * @var array Given the first day of november, the day thanksgiving is on.
@@ -71,17 +71,17 @@ class IndexController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function getIndex()
+    public function getCurrent($year = null, $mode = null)
     {
-        $debugDate = Input::get('date');
-        $debugYear = Input::get('year');
+        $currentDate = new \DateTime();
 
-        $date = isset($debugDate) ? \DateTime::createFromFormat('Y-m-d', $debugDate) : new \DateTime();
-        $year = isset($debugYear) ? $debugYear : $date->format('Y');
+        $debugDate = Input::get('date');
+
+        $date = isset($debugDate) ? \DateTime::createFromFormat('Y-m-d', $debugDate) : $currentDate;
+        $year = isset($year) ? $year : $currentDate->format('Y');
 
         $feddDay = self::getFeddDate($year);
-
-        $mode = self::getMode($date, $feddDay);
+        $mode = isset($mode) ? $mode : self::getMode($date, $feddDay);
 
         switch ($mode) {
             case "repeater":

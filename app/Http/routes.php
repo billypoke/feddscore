@@ -24,6 +24,7 @@
 
 Route::group(['middleware' => ['web']], function () {
     Route::get('/dashboard/{year?}/{mode?}', [
-        'uses' => 'IndexController@getIndex'
+        'as' => 'dashboard',
+        'uses' => 'DashboardController@getCurrent'
     ]);
 });

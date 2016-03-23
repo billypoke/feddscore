@@ -51,13 +51,13 @@
         {% endif %}
     {% else %}
         {% if place == "first" %}
-            <img src="public/img/ribbon1_blue.png" alt="First Place" title="First Place">
+            <img src="{{ asset('public/img/ribbon1_blue.png') }}" alt="First Place" title="First Place">
         {% elseif place == "second" %}
-            <img src="public/img/ribbon2_red.png" alt="Second Place" title="Second Place">
+            <img src="{{ asset('public/img/ribbon2_red.png') }}" alt="Second Place" title="Second Place">
         {% elseif place == "third" %}
-            <img src="public/img/ribbon3_white.png" alt="Third Place" title="Third Place">
+            <img src="{{ asset('public/img/ribbon3_white.png') }}" alt="Third Place" title="Third Place">
         {% elseif place == "honorable" %}
-            <img src="public/img/ribbonH_green.png" alt="Honorable Mention" title="Honorable Mention">
+            <img src="{{ asset('public/img/ribbonH_green.png') }}" alt="Honorable Mention" title="Honorable Mention">
         {% endif %}
     {% endif %}
 {% endmacro %}
