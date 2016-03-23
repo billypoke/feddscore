@@ -69,15 +69,14 @@ class IndexController extends Controller
      *      @var $debugYear string
      * to override the auto-generated values
      *
-     * @param \DateTime $date   The current date
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public static function getIndex(\DateTime $date)
+    public function getIndex()
     {
         $debugDate = Input::get('date');
         $debugYear = Input::get('year');
 
-        $date = isset($debugDate) ? \DateTime::createFromFormat('Y-m-d', $debugDate) : $date;
+        $date = isset($debugDate) ? \DateTime::createFromFormat('Y-m-d', $debugDate) : new \DateTime();
         $year = isset($debugYear) ? $debugYear : $date->format('Y');
 
         $feddDay = self::getFeddDate($year);

@@ -23,7 +23,7 @@
 */
 
 Route::group(['middleware' => ['web']], function () {
-    Route::get('/', function () {
-        return \FeddScore\Http\Controllers\IndexController::getIndex(new DateTime());
-    });
+    Route::get('/dashboard/{year?}/{mode?}', [
+        'uses' => 'IndexController@getIndex'
+    ]);
 });
