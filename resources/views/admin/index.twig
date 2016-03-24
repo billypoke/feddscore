@@ -1,0 +1,85 @@
+{% extends "admin/skeleton.html" %}
+
+{% block title "Control Panel" %}
+
+{% block content %}
+
+    <h2>Competitions</h2>
+
+    <form action="" method="POST">
+
+        <p class="selectors">
+            <strong>Select:</strong>
+            {% for class, title in {'compselect': "All", 'notaclass': "None", 'am': "AM", 'pm': "PM", 'waiting': "Waiting", 'active': "Active", 'final': "Final"} %}
+            <a href="#" onclick="$('.compselect').removeAttr('checked'); $('.{{ class }}').attr('checked', 'checked'); return false;">{{ title }}</a>{% if not loop.last %} | {% endif %}
+            {% endfor %}
+        </p>
+
+        <table class="competitions">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Session</th>
+                    <th colspan="2">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comp in competitions %}
+                <tr{% if edit and edit.id == comp.id %} class="edit"{% endif %}>
+                    <td><input type="checkbox" name="competitions[]" value="{{ comp.id }}" class="compselect {{ comp.ampm }} {{ comp.status }}"></td>
+                    <td><a href="{{ url('competition.php', {id: comp.id}) }}">{{ comp.name }}</a></td>
+                    <td>{{ comp.ampm|upper }}</td>
+                    <td>{{ comp.status|title }}</td>
+                    <td>{% if edit and edit.id == comp.id %}Editing Below{% else %}<a href="?edit={{ comp.id }}">Edit</a>{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p class="buttons">
+            <strong>With Selected:</strong>
+            <button type="submit" name="action" value="waiting">Mark Waiting</button>
+            <button type="submit" name="action" value="active">Mark Active</button>
+            <button type="submit" name="action" value="final">Mark Final</button>
+            <button type="submit" name="action" value="delete" onclick="return confirm('Do you really want to delete the checked competitions?');">Delete</button>
+        </p>
+
+    </form>
+
+    <form action="?" method="POST" class="box {{ edit ? 'edit' : 'add' }}">
+
+        <h2>{{ edit ? "Edit" : "Add" }} Competition</h2>
+
+        <p>
+            <strong>Name:</strong>
+            <input name="name" type="text" value="{{ edit.name }}" autofocus>
+
+            <label>
+                <input name="ampm" type="radio" value="am"
+                       {% if not edit or edit.ampm == "am" %} checked{% endif %}>
+                AM
+            </label>
+            <label>
+                <input name="ampm" type="radio" value="pm"
+                       {% if edit.ampm == "pm" %} checked{% endif %}>
+                PM
+            </label>
+        </p>
+
+        <p>
+            {% if edit %}
+            <input type="hidden" name="original" value="{{ edit.id }}">
+            <button type="submit" name="action" value="edit">Save</button>
+            <button type="submit" name="action" value="add">Save as New</button>
+            <a href="?">Cancel</button>
+            {% else %}
+            <input type="hidden" name="action" value="add">
+            <button type="submit">Add</button>
+            {% endif %}
+        </p>
+    
+    </form>
+
+{% endblock content %}
+
