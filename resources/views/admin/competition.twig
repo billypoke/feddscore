@@ -1,5 +1,5 @@
-{% extends "admin/skeleton.html" %}
-{% from "scoreboard/helpers.html" import competitiondiv %}
+{% extends "admin/skeleton" %}
+{% from "scoreboard/helpers" import competitiondiv %}
 
 {% block title competition.name %}
 
@@ -45,7 +45,7 @@
     </p>
 
     <form action="" method="POST">
-
+        {{ csrf_field() }}
         <table id="teams">
             <thead>
                 <tr>
@@ -116,7 +116,7 @@
     <h2>Add Teams</h2>
 
     <form action="" method="POST">
-
+        {{ csrf_field() }}
         <p>Enter team names in this text area, one per line.</p>
 
         <p><textarea name="names" rows="10" cols="64"></textarea></p>

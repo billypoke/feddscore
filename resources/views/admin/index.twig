@@ -1,4 +1,4 @@
-{% extends "admin/skeleton.html" %}
+{% extends "admin/skeleton" %}
 
 {% block title "Control Panel" %}
 
@@ -7,7 +7,7 @@
     <h2>Competitions</h2>
 
     <form action="" method="POST">
-
+        {{ csrf_field() }}
         <p class="selectors">
             <strong>Select:</strong>
             {% for class, title in {'compselect': "All", 'notaclass': "None", 'am': "AM", 'pm': "PM", 'waiting': "Waiting", 'active': "Active", 'final': "Final"} %}
@@ -28,7 +28,7 @@
                 {% for comp in competitions %}
                 <tr{% if edit and edit.id == comp.id %} class="edit"{% endif %}>
                     <td><input type="checkbox" name="competitions[]" value="{{ comp.id }}" class="compselect {{ comp.ampm }} {{ comp.status }}"></td>
-                    <td><a href="{{ url('competition.php', {id: comp.id}) }}">{{ comp.name }}</a></td>
+                    <td><a href="{{ url('competition', {id: comp.id}) }}">{{ comp.name }}</a></td>
                     <td>{{ comp.ampm|upper }}</td>
                     <td>{{ comp.status|title }}</td>
                     <td>{% if edit and edit.id == comp.id %}Editing Below{% else %}<a href="?edit={{ comp.id }}">Edit</a>{% endif %}</td>
@@ -48,7 +48,7 @@
     </form>
 
     <form action="?" method="POST" class="box {{ edit ? 'edit' : 'add' }}">
-
+        {{ csrf_field() }}
         <h2>{{ edit ? "Edit" : "Add" }} Competition</h2>
 
         <p>
@@ -72,7 +72,7 @@
             <input type="hidden" name="original" value="{{ edit.id }}">
             <button type="submit" name="action" value="edit">Save</button>
             <button type="submit" name="action" value="add">Save as New</button>
-            <a href="?">Cancel</button>
+            <button href="?">Cancel</button>
             {% else %}
             <input type="hidden" name="action" value="add">
             <button type="submit">Add</button>

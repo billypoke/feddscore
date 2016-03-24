@@ -35,4 +35,14 @@ Route::group(['middleware' => ['web']], function () {
         Route::get('final', ['as' => 'dashboard.final', 'uses' => 'DashboardController@getFinal']);
         Route::get('hall-of-fame', ['as' => 'dashboard.hof', 'uses' => 'DashboardController@getHallOfFame']);
     });
+
+    Route::group(['prefix' => 'admin/'], function() {
+        Route::get('/', ['as' => 'admin', 'uses' => 'AdminController@getAdmin']);
+        Route::post('/', ['as' => 'admin', 'uses' => 'AdminController@addComp']);
+    });
+
+    Route::group(['prefix' => 'competition/'], function() {
+        Route::get('{id?}', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
+        Route::post('{id?}', ['as' => 'competition', 'uses' => 'AdminController@editCompetitionTeams']);
+    });
 });
