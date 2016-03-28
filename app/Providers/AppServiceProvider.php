@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(DesignDay::class, function ($app) {
-            return new DesignDay(new DateTime());
+            return new DesignDay(new DateTime(env('TODAY', 'now')));
         });
     }
 }
