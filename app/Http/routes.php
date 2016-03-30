@@ -23,6 +23,8 @@
 */
 
 Route::group(['middleware' => ['web']], function () {
+
+
     Route::group(['prefix' => 'dashboard/{year?}'], function() {
         Route::get('/', [
             'as' => 'dashboard',
@@ -36,13 +38,15 @@ Route::group(['middleware' => ['web']], function () {
         Route::get('hall-of-fame', ['as' => 'dashboard.hof', 'uses' => 'DashboardController@getHallOfFame']);
     });
 
-    Route::group(['prefix' => 'admin/'], function() {
-        Route::get('/', ['as' => 'admin', 'uses' => 'AdminController@getAdmin']);
-        Route::post('/', ['as' => 'admin', 'uses' => 'AdminController@addComp']);
-    });
+    Route::group(['middleware' => ['auth.shib']], function () {
+        Route::group(['prefix' => 'admin/'], function() {
+            Route::get('/', ['as' => 'admin', 'uses' => 'AdminController@getAdmin']);
+            Route::post('/', ['as' => 'admin', 'uses' => 'AdminController@addComp']);
+        });
 
-    Route::group(['prefix' => 'competition/'], function() {
-        Route::get('{id?}', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
-        Route::post('{id?}', ['as' => 'competition', 'uses' => 'AdminController@editCompetitionTeams']);
+        Route::group(['prefix' => 'competition/'], function() {
+            Route::get('{id?}', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
+            Route::post('{id?}', ['as' => 'competition', 'uses' => 'AdminController@editCompetitionTeams']);
+        });
     });
 });
