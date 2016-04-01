@@ -6,7 +6,7 @@
 
     <h2>Competitions</h2>
 
-    <form action="" method="POST">
+    <form name="competitions" action="" method="POST">
         {{ csrf_field() }}
         <p class="selectors">
             <strong>Select:</strong>
@@ -26,8 +26,8 @@
             </thead>
             <tbody>
                 {% for comp in competitions %}
-                <tr{% if edit and edit.id == comp.id %} class="edit"{% endif %}>
-                    <td><input type="checkbox" name="competitions[]" value="{{ comp.id }}" class="compselect {{ comp.ampm }} {{ comp.status }}"></td>
+                <tr id="comp-{{ comp.id }}"{% if edit and edit.id == comp.id %} class="edit"{% endif %}>
+                    <td><input id="select-{{ comp.id }}" type="checkbox" name="competitions[]" value="{{ comp.id }}" class="compselect {{ comp.ampm }} {{ comp.status }}"></td>
                     <td><a href="{{ url('competition', {id: comp.id}) }}">{{ comp.name }}</a></td>
                     <td>{{ comp.ampm|upper }}</td>
                     <td>{{ comp.status|title }}</td>
@@ -53,15 +53,15 @@
 
         <p>
             <strong>Name:</strong>
-            <input name="name" type="text" value="{{ edit.name }}" autofocus>
+            <input id="name" name="name" type="text" value="{{ edit.name }}" autofocus>
 
             <label>
-                <input name="ampm" type="radio" value="am"
+                <input id="am" name="ampm" type="radio" value="am"
                        {% if not edit or edit.ampm == "am" %} checked{% endif %}>
                 AM
             </label>
             <label>
-                <input name="ampm" type="radio" value="pm"
+                <input id="pm" name="ampm" type="radio" value="pm"
                        {% if edit.ampm == "pm" %} checked{% endif %}>
                 PM
             </label>
