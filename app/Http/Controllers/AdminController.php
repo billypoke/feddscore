@@ -78,7 +78,7 @@ class AdminController extends Controller
                 'status' => 'waiting'
             ]);
 
-            $messages[] = ['type' => 'success', 'message' => $this->$name . " &ndash; " . $this->strtoupper($ampm) .
+            $messages[] = ['type' => 'success', 'message' => $name . " &ndash; " . strtoupper($ampm) .
                 " has been added as a competition."];
 
         } else if ($action === 'edit' && $original > 0 && !empty($name) && ($ampm === 'am' || $ampm === 'pm')) {
@@ -89,7 +89,7 @@ class AdminController extends Controller
                     'ampm' => $ampm
                 ]);
 
-            $messages[] = ['type' => 'success', 'message' => $this->$name . " &ndash; " . $this->strtoupper($ampm) .
+            $messages[] = ['type' => 'success', 'message' => $name . " &ndash; " . strtoupper($ampm) .
                 " has been edited."];
 
         } else if (!empty($action) && array_key_exists($action, $this->actions) && !empty($competitions) && is_array($competitions)) {

@@ -1,17 +1,36 @@
 Manage and display a rotating scoreboard for Freshman Engineering Design Day
 ***
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
-
 ## Install
 
-Via Composer. Install dependencies and then run all DB migrations
+Add PHP 5.6
+```bash
+$ add php56
+```
 
+Via Composer. Install dependencies, 
 ``` bash
 $ composer install
+```
 
+Then copy `.env.example` in the root to `.env` and fill in the database credentials as well as the `ALLOWED_USERS`,
+```bash
+$ cp .env.example .env
+```
+
+And then run all DB migrations.
+```bash
 $ php artisan migrate
+```
+
+Then set up CSRF (Cross Site Request Forgery) protection by running
+```bash
+$ php artisan key:generate
+```
+
+And to suppress `ini_set` errors, run the following. See [mdwheele/sample's README](https://github.ncsu.edu/mdwheele/sample/#suppress-all-calls-to-ini_set-in-composer-dependencies) for an explanation
+```bash                                                         
+find ./vendor -type f -exec sed -i 's/@*ini_set/@ini_set/g' {} \;
 ```
 
 ## Testing
