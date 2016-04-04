@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
+use \FeddScore\Competition;
+
 class AdminTest extends TestCase
 {
     use DatabaseMigrations;
@@ -115,7 +117,19 @@ class AdminTest extends TestCase
     /** @test */
     public function it_can_disqualify_a_team()
     {
+        $competition = $this->createAFakeCompetitionWithTeams('active')->first();
+        $teams = $competition->teams()->get();
 
+        $team = $teams[0];
+        $otherTeam = $teams[1];
+
+        $this->visit("competition/{$competition->id}")
+            ->see($team->name)
+            ->see($otherTeam->name)
+            ->check("update[{$team->id}][dq]")
+            ->press('Save')
+            ->seeIsChecked("update[{$team->id}][dq]")
+            ->dontSeeIsChecked("update[{$otherTeam->id}][dq]");
     }
 
     /** @test */
@@ -131,7 +145,7 @@ class AdminTest extends TestCase
 
     private function createAFakeCompetition($status)
     {
-        return factory(FeddScore\Competition::class, $status, 1)
+        return factory(FeddScore\Competition::class, $status)
             ->create();
     }
 
@@ -140,7 +154,7 @@ class AdminTest extends TestCase
         return factory(FeddScore\Competition::class, $status, 2)
             ->create()
             ->each(function($competition) {
-                $competition->teams()->save(factory(FeddScore\Team::class)->make());
+                $competition->teams()->saveMany(factory(FeddScore\Team::class, 2)->make());
             });
     }
 }
