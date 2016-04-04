@@ -103,15 +103,15 @@ class AdminTest extends TestCase
         $competition = $this->createAFakeCompetitionWithTeams('active')->first();
         $team = $competition->teams()->first();
 
-        $randomScore = range(0,100);
+        $randomScore = random_int(0,100);
 
         $input = [
-            "update[{$team->id}][score]"=>$randomScore
+            "update[{$team->id}][score]" => $randomScore
         ];
 
         $this->visit("competition/{$competition->id}")
             ->submitForm('Save', $input)
-            ->seeElement("update[{$team->id}][score]", ['value'=>$randomScore]);
+            ->seeElement("input[name=\"update[{$team->id}][score]\"]", ['value'=>$randomScore]);
     }
 
     /** @test */
@@ -135,12 +135,32 @@ class AdminTest extends TestCase
     /** @test */
     public function it_can_assign_a_place()
     {
+        $competition = $this->createAFakeCompetitionWithTeams('active')->first();
+        $teams = $competition->teams()->get();
 
+        $team = $teams[0];
+        $otherTeam = $teams[1];
+
+        $this->visit("competition/{$competition->id}")
+            ->select('first', "update[{$team->id}][place]")
+            ->press('Save')
+            ->seeElement("select[name=\"update[{$team->id}][place]\"] option[value=\"first\"]", ['selected' => true])
+            ->seeElement("select[name=\"update[{$otherTeam->id}][place]\"] option[value=\"first\"]", ['selected' => false]);
     }
 
+    /** @test */
     public function it_can_delete_a_team()
     {
+        $competition = $this->createAFakeCompetitionWithTeams('active')->first();
+        $teams = $competition->teams()->get();
 
+        $team = $teams[0];
+        $otherTeam = $teams[1];
+
+        $this->visit("competition/{$competition->id}")
+            ->press('Del')
+            ->dontSee($team->name)
+            ->see($otherTeam->name);
     }
 
     private function createAFakeCompetition($status)
