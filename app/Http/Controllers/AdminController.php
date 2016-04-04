@@ -170,7 +170,7 @@ class AdminController extends Controller
 
         } else if ($action === 'save' && is_array($toUpdate)) {
             // update ALL THE TEAMS!
-            foreach ($_POST['update'] as $textID => $submitted) {
+            foreach ($toUpdate as $textID => $submitted) {
                 if (!is_array($submitted)) continue;
                 // ID
                 $id = (int)($textID);
