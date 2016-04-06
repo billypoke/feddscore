@@ -57,7 +57,7 @@ class AdminController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function addComp()
+    public function modifyCompetition()
     {
         $year = date('Y');
 

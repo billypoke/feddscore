@@ -41,7 +41,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::group(['middleware' => ['auth.shib']], function () {
         Route::group(['prefix' => 'admin/'], function() {
             Route::get('/', ['as' => 'admin', 'uses' => 'AdminController@getAdmin']);
-            Route::post('/', ['as' => 'admin', 'uses' => 'AdminController@addComp']);
+            Route::post('/', ['as' => 'admin', 'uses' => 'AdminController@modifyCompetition']);
         });
 
         Route::group(['prefix' => 'competition/'], function() {
