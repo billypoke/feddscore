@@ -28,7 +28,13 @@ Then set up CSRF (Cross Site Request Forgery) protection by running
 $ php artisan key:generate
 ```
 
-And to suppress `ini_set` errors, run the following. See [mdwheele/sample's README](https://github.ncsu.edu/mdwheele/sample/#suppress-all-calls-to-ini_set-in-composer-dependencies) for an explanation
+Currently, a find/sed command is required to deploy the application into
+the web environment. This command goes through the vendor folder and prepends
+any ini_set command with @ to suppress errors in PHP configurations that
+disallow the use of ini_set. It's not included as a post-update or
+post-install command for composer because composer is not given enough
+time to run the command due to environment restrictions on execution time.
+
 ```bash                                                         
 find ./vendor -type f -exec sed -i 's/@*ini_set/@ini_set/g' {} \;
 ```
