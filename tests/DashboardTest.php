@@ -4,7 +4,7 @@ use FeddScore\DesignDay;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class IndexTest extends TestCase
+class DashboardTest extends TestCase
 {
     use DatabaseMigrations;
 
