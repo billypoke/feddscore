@@ -13,8 +13,7 @@ class AdminController extends Controller
     private $actions = array(
         'waiting' => "marked as waiting",
         'active' => "activated",
-        'final' => "finalized",
-        'delete' => "deleted"
+        'final' => "finalized"
     );
 
     private $places = array(
@@ -47,29 +46,21 @@ class AdminController extends Controller
 
         return view('admin/index', [
             'competitions' => $comps,
-            'messages' =>$messages,
+            'messages' => $messages,
             'edit' => $toEdit
         ]);
     }
 
-    /**
-     * All input (get/post) is accessed with Input::get()
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function modifyCompetition()
+    public function addCompetition()
     {
         $year = date('Y');
 
         $messages = array();
 
-        $action = Input::get('action');
-        $original = (int)(Input::get('original'));
         $name = Input::get('name');
         $ampm = Input::get('ampm');
-        $competitions = Input::get('competitions');
 
-        if ($action === 'add' && !empty($name) && ($ampm === 'am' || $ampm === 'pm')) {
+        if (!empty($name) && ($ampm === 'am' || $ampm === 'pm')) {
             // Add a new competition
             Competition::insert([
                 'name' => $name,
@@ -80,8 +71,21 @@ class AdminController extends Controller
 
             $messages[] = ['type' => 'success', 'message' => $name . " &ndash; " . strtoupper($ampm) .
                 " has been added as a competition."];
+        } else {
+            $messages[] = ['type' => 'success', 'message' => 'ERROR: Name and time are required'];
+        }
 
-        } else if ($action === 'edit' && $original > 0 && !empty($name) && ($ampm === 'am' || $ampm === 'pm')) {
+        return $this->getAdmin($messages);
+    }
+
+    public function renameCompetition()
+    {
+        $original = (int)(Input::get('original'));
+        $name = Input::get('name');
+        $ampm = Input::get('ampm');
+        $messages = array();
+
+        if ($original > 0 && !empty($name) && ($ampm === 'am' || $ampm === 'pm')) {
             // Update a competition
             Competition::where('id', $original)
                 ->update([
@@ -92,7 +96,19 @@ class AdminController extends Controller
             $messages[] = ['type' => 'success', 'message' => $name . " &ndash; " . strtoupper($ampm) .
                 " has been edited."];
 
-        } else if (!empty($action) && array_key_exists($action, $this->actions) && !empty($competitions) && is_array($competitions)) {
+        } else {
+            $messages[] = ['type' => 'success', 'message' => 'ERROR: A new name and time are required'];
+        }
+
+        return $this->getAdmin($messages);
+    }
+
+    public function editCompetition($action)
+    {
+        $competitions = Input::get('competitions');
+        $messages = array();
+
+        if (!empty($action) && array_key_exists($action, $this->actions) && !empty($competitions) && is_array($competitions)) {
             // Something else
             $ids = array();
             foreach ($competitions as $competitionID) {
@@ -113,10 +129,10 @@ class AdminController extends Controller
                         $comps->update(array('status' => 'waiting'));
                         break;
                     case 'active':
-                        $comps->update(array('status'=> 'active'));
+                        $comps->update(array('status' => 'active'));
                         break;
                     case 'final':
-                        $comps->update(array('status'=> 'final'));
+                        $comps->update(array('status' => 'final'));
                         break;
                     case 'delete':
                         $comps->delete();
@@ -124,6 +140,38 @@ class AdminController extends Controller
             }
             $messages[] = ['type' => 'success', 'message' => "The selected competitions have been " .
                 $this->actions[$action] . "."];
+        } else {
+            $messages[] = ['type' => 'success', 'message' => "ERROR: The selected competitions were NOT " .
+                $this->actions[$action] . "."];
+        }
+
+        return $this->getAdmin($messages);
+    }
+
+    public function deleteCompetition()
+    {
+        $competitions = Input::get('competitions');
+        $messages = array();
+
+        if ((Input::get('action') == 'delete') && !empty($competitions) && is_array($competitions)) {
+            // Something else
+            $ids = array();
+            foreach ($competitions as $competitionID) {
+                $id = (int)$competitionID;
+                if ($id < 1) {
+                    $ids = NULL;
+                    break;
+                }
+                $ids[] = $id;
+            }
+
+            if ($ids) {
+                $comps = Competition::whereIn('id', $ids);
+                $comps->delete();
+            }
+            $messages[] = ['type' => 'success', 'message' => "The selected competitions have been deleted."];
+        } else {
+            $messages[] = ['type' => 'success', 'message' => "ERROR: The selected competitions were NOT deleted."];
         }
 
         return $this->getAdmin($messages);
@@ -136,7 +184,7 @@ class AdminController extends Controller
 
         $competition = $this->getCompetition($id);
 
-        if($competition == null)
+        if ($competition == null)
             return view('admin/error', ['message' => 'That competition does not exist.']);
 
         return view('admin/competition', [
@@ -145,30 +193,20 @@ class AdminController extends Controller
         ]);
     }
 
-    public function editCompetitionTeams($competitionId)
+    public function saveCompetitionTeams($competitionId)
     {
-        if ($competitionId == null)
+        if ($competitionId == null){
             return view('admin/error', ['message' => 'Invalid Competition ID.']);
+        }
 
         $competition = $this->getCompetition($competitionId);
-        if($competition == null)
+        if ($competition == null){
             return view('admin/error', ['message' => 'That competition does not exist.']);
+        }
 
-        $action = Input::get('action');
-        $delete = Input::get('delete');
         $toUpdate = Input::get('update');
-        $toInsert = Input::get('names');
 
-        $messages = array();
-
-        if (!empty($delete)) {
-            $id = (int)($delete);
-            if ($id > 0) {
-                Team::where('id', $id)->delete();
-            }
-            $messages[] = ['type' => 'success', 'message' => "The team has been deleted."];
-
-        } else if ($action === 'save' && is_array($toUpdate)) {
+        if (is_array($toUpdate)) {
             // update ALL THE TEAMS!
             foreach ($toUpdate as $textID => $submitted) {
                 if (!is_array($submitted)) continue;
@@ -198,7 +236,29 @@ class AdminController extends Controller
             }
             $messages[] = ['type' => 'success', 'message' => "The team data has been saved."];
 
-        } else if ($action === 'add' && !empty($toInsert)) {
+        } else {
+            $messages[] = ['type' => 'success', 'message' => "ERROR: The teams were not updated."];
+        }
+
+        return $this->showCompetitionTeams($competitionId, $messages);
+    }
+
+    public function addCompetitionTeams($competitionId)
+    {
+        if ($competitionId == null){
+            return view('admin/error', ['message' => 'Invalid Competition ID.']);
+        }
+
+        $competition = $this->getCompetition($competitionId);
+        if ($competition == null){
+            return view('admin/error', ['message' => 'That competition does not exist.']);
+        }
+
+        $toInsert = Input::get('names');
+
+        $messages = array();
+
+        if (!empty($toInsert)) {
             $names = explode("\n", trim($toInsert));
 
             foreach ($names as $name) {
@@ -211,6 +271,35 @@ class AdminController extends Controller
                 }
             }
             $messages[] = ['type' => 'success', 'message' => "The new teams have been added."];
+        } else {
+            $messages[] = ['type' => 'success', 'message' => "ERROR: No team names were provided."];
+        }
+
+        return $this->showCompetitionTeams($competitionId, $messages);
+    }
+
+    public function deleteCompetitionTeams($competitionId)
+    {
+        if ($competitionId == null){
+            return view('admin/error', ['message' => 'Invalid Competition ID.']);
+        }
+
+        $competition = $this->getCompetition($competitionId);
+        if ($competition == null){
+            return view('admin/error', ['message' => 'That competition does not exist.']);
+        }
+
+        $delete = Input::get('delete');
+
+        if (!empty($delete)) {
+            $id = (int)($delete);
+            if ($id > 0) {
+                Team::where('id', $id)->delete();
+            }
+            $messages[] = ['type' => 'success', 'message' => "The team has been deleted."];
+
+        } else {
+            $messages[] = ['type' => 'success', 'message' => "ERROR: The team was not deleted."];
         }
 
         return $this->showCompetitionTeams($competitionId, $messages);
