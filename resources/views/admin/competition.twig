@@ -95,7 +95,7 @@
                         </select>
                     </td>
                     <td style="padding-left: 5em;">
-                        <button type="submit" name="delete" value="{{ team.id }}" tabindex="-5" onclick="return confirm({{ ("Do you really want to delete " ~ team.name ~ "?")|json_encode }});">Del</button>
+                        <button type="submit" name="delete" value="{{ team.id }}" formaction="{{ route('teams.delete', {'id' : competition.id}) }}" tabindex="-5" onclick="return confirm({{ ("Do you really want to delete " ~ team.name ~ "?")|json_encode }});">Del</button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -103,7 +103,7 @@
             <tfoot>
                 <tr>
                     <td colspan="5">
-                        <button id="save-button" name="action" type="submit" value="save">
+                        <button id="save-button" name="action" type="submit" value="save" formaction="{{ route('teams.save', {'id' : competition.id}) }}">
                             Save
                         </button>
                     </td>
@@ -121,7 +121,7 @@
 
         <p><textarea name="names" rows="10" cols="64"></textarea></p>
 
-        <p><button type="submit" name="action" value="add">Add Teams</button></p>
+        <p><button type="submit" name="action" value="add" formaction="{{ route('teams.add', {'id' : competition.id}) }}">Add Teams</button></p>
 
     </form>
 

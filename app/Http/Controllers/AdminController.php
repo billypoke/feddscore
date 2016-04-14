@@ -103,8 +103,12 @@ class AdminController extends Controller
         return $this->getAdmin($messages);
     }
 
-    public function editCompetition($action)
+    public function editCompetition($action = null)
     {
+        if (!isset($action)) {
+            $action = Input::get('action');
+        }
+
         $competitions = Input::get('competitions');
         $messages = array();
 

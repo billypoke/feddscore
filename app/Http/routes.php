@@ -42,23 +42,8 @@ Route::group(['middleware' => ['web']], function () {
 
     Route::group(['middleware' => ['auth.shib']], function () {
         Route::group(['prefix' => 'admin/'], function() {
-            Route::get('/', ['as' => 'admin', 'uses' => 'AdminController@getAdmin']);
+            Route::match(['get', 'post'], '/', ['as' => 'admin', 'uses' => 'AdminController@getAdmin']);
 
-            Route::post('/', ['as' => 'competition', function() {
-                $action = Input::get('action');
-                $adminController = new \FeddScore\Http\Controllers\AdminController();
-
-                switch ($action) {
-                    case 'add': return $adminController->addCompetition();
-                    case 'edit': return $adminController->renameCompetition();
-                    case 'waiting':
-                    case 'active':
-                    case 'final': return $adminController->editCompetition($action);
-                    case 'delete': return $adminController->deleteCompetition();
-                }
-
-                return $adminController->getAdmin();
-            }]);
             Route::post('/add', ['as' => 'competition.add', 'uses' => 'AdminController@addCompetition']);
             Route::post('/edit', ['as' => 'competition.edit', 'uses' => 'AdminController@editCompetition']);
             Route::post('/rename', ['as' => 'competition.rename', 'uses' => 'AdminController@renameCompetition']);
@@ -66,23 +51,9 @@ Route::group(['middleware' => ['web']], function () {
         });
 
         Route::group(['prefix' => 'competition/'], function() {
-            Route::get('{id?}', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
-            Route::post('{id?}', ['as' => 'teams', function($competitionId) {
-                $action = Input::get('action');
-                $adminController = new \FeddScore\Http\Controllers\AdminController();
+            Route::match(['get', 'post'], '{id?}', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
 
-                switch ($action) {
-                    case 'add': return $adminController->addCompetitionTeams($competitionId);
-                    case 'save': return $adminController->saveCompetitionTeams($competitionId);
-                }
-
-                if (!empty(Input::get('delete'))) {
-                    return $adminController->deleteCompetitionTeams($competitionId);
-                }
-
-                return $adminController->showCompetitionTeams($competitionId);
-            }]);
-            Route::post('{id?}/edit', ['as' => 'teams.add', 'uses' => 'AdminController@saveCompetitionTeams']);
+            Route::post('{id?}/edit', ['as' => 'teams.save', 'uses' => 'AdminController@saveCompetitionTeams']);
             Route::post('{id?}/add', ['as' => 'teams.add', 'uses' => 'AdminController@addCompetitionTeams']);
             Route::post('{id?}/delete', ['as' => 'teams.delete', 'uses' => 'AdminController@deleteCompetitionTeams']);
         });
