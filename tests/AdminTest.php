@@ -13,10 +13,14 @@ class AdminTest extends TestCase
     /** @test */
     public function it_can_create_competitions()
     {
+        $input = [
+            'name' => 'Competition Name',
+            'ampm' => 'am'
+        ];
         $this->visit('admin')
-            ->type('Competition Name', '#name')
-            ->select('am', 'ampm')
-            ->press('Add')
+            ->dontSee('Competition Name');
+        $this->call('POST', 'admin/add', $input);
+        $this->seePageIs('admin/add')
             ->see('Competition Name');
     }
 
@@ -25,6 +29,11 @@ class AdminTest extends TestCase
     {
         $competition = $this->createAFakeCompetition('waiting');
 
+        $input = [
+            'name' => 'New Name',
+            'ampm' => 'am'
+        ];
+
         $this->visit('admin')
             ->click('Edit')
             ->seeElement('.edit')
@@ -32,8 +41,9 @@ class AdminTest extends TestCase
             ->seeElement('#name', ['value'=>$competition->name])
             ->type('New Name', '#name')
             ->seeElement('#am', ['checked'=>true])
-            ->seeElement('#pm', ['checked'=>false])
-            ->press('Save')
+            ->seeElement('#pm', ['checked'=>false]);
+        $this->call('POST', 'admin/rename', $input);
+        $this->seePageIs('admin/rename')
             ->see('New Name');
     }
 
@@ -42,6 +52,11 @@ class AdminTest extends TestCase
     {
         $competition = $this->createAFakeCompetition('waiting');
 
+        $input = [
+            'name' => 'New Name',
+            'ampm' => 'am'
+        ];
+
         $this->visit('admin')
             ->click('Edit')
             ->seeElement('.edit')
@@ -49,8 +64,9 @@ class AdminTest extends TestCase
             ->seeElement('#name', ['value'=>$competition->name])
             ->type('New Name', '#name')
             ->seeElement('#am', ['checked'=>true])
-            ->seeElement('#pm', ['checked'=>false])
-            ->press('Save as New')
+            ->seeElement('#pm', ['checked'=>false]);
+        $this->call('POST', 'admin/add', $input);
+        $this->seePageIs('admin/add')
             ->see('New Name')
             ->see($competition->name);
     }
@@ -61,11 +77,14 @@ class AdminTest extends TestCase
         $competition = $this->createAFakeCompetition('waiting');
 
         $input = [
-            "competitions[0]" => $competition->id
+            "competitions" => array($competition->id),
+            'action' => 'active'
         ];
 
         $this->visit('admin')
-            ->submitForm('Mark Active', $input)
+            ->seeInElement("#comp-{$competition->id} td:nth-child(4)", 'Waiting');
+        $this->call('POST', 'admin/edit', $input);
+        $this->seePageIs('admin/edit')
             ->seeInElement("#comp-{$competition->id} td:nth-child(4)", 'Active');
     }
 
@@ -75,11 +94,14 @@ class AdminTest extends TestCase
         $competition = $this->createAFakeCompetition('waiting');
 
         $input = [
-            "competitions[0]" => $competition->id
+            "competitions" => array($competition->id),
+            'action' => 'delete'
         ];
 
         $this->visit('admin')
-            ->submitForm('Delete', $input)
+            ->see($competition->name);
+        $this->call('POST', 'admin/delete', $input);
+        $this->seePageIs('admin/delete')
             ->dontSee($competition->name);
     }
 
@@ -88,11 +110,14 @@ class AdminTest extends TestCase
     {
         $competition = $this->createAFakeCompetition('waiting');
 
-        $teams = "Team A\r\nTeam B";
+        $teams = [
+            'names' => "Team A\nTeam B"
+        ];
 
         $this->visit("competition/{$competition->id}")
-            ->type($teams, 'names')
-            ->press('Add Teams')
+            ->type($teams, 'names');
+        $this->call('POST', "competition/{$competition->id}/add", $teams);
+        $this->seePageIs("competition/{$competition->id}/add")
             ->seeElement('.teaminput', ['value'=>'Team A'])
             ->seeElement('.teaminput', ['value'=>'Team B']);
     }
@@ -101,17 +126,31 @@ class AdminTest extends TestCase
     public function it_can_add_scores()
     {
         $competition = $this->createAFakeCompetitionWithTeams('active')->first();
-        $team = $competition->teams()->first();
+        $teams = $competition->teams()->get();
+
+        $team = $teams[0];
+        $otherTeam = $teams[1];
 
         $randomScore = random_int(0,100);
 
         $input = [
-            "update[{$team->id}][score]" => $randomScore
+            "update" => [
+                $team->id => [
+                    'name' => $team->name,
+                    'score' => $randomScore,
+                    'place' => $team->place,
+                    'dq' => $team->dq
+                ]
+            ]
         ];
 
         $this->visit("competition/{$competition->id}")
-            ->submitForm('Save', $input)
-            ->seeElement("input[name=\"update[{$team->id}][score]\"]", ['value'=>$randomScore]);
+            ->see($team->name)
+            ->see($otherTeam->name);
+        $this->call('POST', "competition/{$competition->id}/edit", $input);
+        $this->seePageIs("competition/{$competition->id}/edit")
+            ->seeElement("input[name=\"update[{$team->id}][score]\"]", ['value'=>$randomScore])
+            ->seeElement("input[name=\"update[{$otherTeam->id}][score]\"]", ['value'=>$otherTeam->score]);
     }
 
     /** @test */
@@ -123,11 +162,22 @@ class AdminTest extends TestCase
         $team = $teams[0];
         $otherTeam = $teams[1];
 
+        $input = [
+            "update" => [
+                $team->id => [
+                    'name' => $team->name,
+                    'score' => $team->score,
+                    'place' => $team->place,
+                    'dq' => true
+                ]
+            ]
+        ];
+
         $this->visit("competition/{$competition->id}")
             ->see($team->name)
-            ->see($otherTeam->name)
-            ->check("update[{$team->id}][dq]")
-            ->press('Save')
+            ->see($otherTeam->name);
+        $this->call('POST', "competition/{$competition->id}/edit", $input);
+        $this->seePageIs("competition/{$competition->id}/edit")
             ->seeIsChecked("update[{$team->id}][dq]")
             ->dontSeeIsChecked("update[{$otherTeam->id}][dq]");
     }
@@ -141,9 +191,22 @@ class AdminTest extends TestCase
         $team = $teams[0];
         $otherTeam = $teams[1];
 
+        $input = [
+            "update" => [
+                $team->id => [
+                    'name' => $team->name,
+                    'score' => $team->score,
+                    'place' => 'first',
+                    'dq' => $team->dq
+                ]
+            ]
+        ];
+
         $this->visit("competition/{$competition->id}")
-            ->select('first', "update[{$team->id}][place]")
-            ->press('Save')
+            ->see($team->name)
+            ->see($otherTeam->name);
+        $this->call('POST', "competition/{$competition->id}/edit", $input);
+        $this->seePageIs("competition/{$competition->id}/edit")
             ->seeElement("select[name=\"update[{$team->id}][place]\"] option[value=\"first\"]", ['selected' => true])
             ->seeElement("select[name=\"update[{$otherTeam->id}][place]\"] option[value=\"first\"]", ['selected' => false]);
     }
@@ -157,8 +220,15 @@ class AdminTest extends TestCase
         $team = $teams[0];
         $otherTeam = $teams[1];
 
+        $input = [
+            'delete' => $team->id
+        ];
+
         $this->visit("competition/{$competition->id}")
-            ->press('Del')
+            ->see($team->name)
+            ->see($otherTeam->name);
+        $this->call('POST', "competition/{$competition->id}/delete", $input);
+        $this->seePageIs("competition/{$competition->id}/delete")
             ->dontSee($team->name)
             ->see($otherTeam->name);
     }
