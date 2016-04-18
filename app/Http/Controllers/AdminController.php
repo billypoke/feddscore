@@ -199,15 +199,6 @@ class AdminController extends Controller
 
     public function saveCompetitionTeams($competitionId)
     {
-        if ($competitionId == null){
-            return view('admin/error', ['message' => 'Invalid Competition ID.']);
-        }
-
-        $competition = $this->getCompetition($competitionId);
-        if ($competition == null){
-            return view('admin/error', ['message' => 'That competition does not exist.']);
-        }
-
         $toUpdate = Input::get('update');
 
         if (is_array($toUpdate)) {
@@ -249,15 +240,6 @@ class AdminController extends Controller
 
     public function addCompetitionTeams($competitionId)
     {
-        if ($competitionId == null){
-            return view('admin/error', ['message' => 'Invalid Competition ID.']);
-        }
-
-        $competition = $this->getCompetition($competitionId);
-        if ($competition == null){
-            return view('admin/error', ['message' => 'That competition does not exist.']);
-        }
-
         $toInsert = Input::get('names');
 
         $messages = array();
@@ -284,15 +266,6 @@ class AdminController extends Controller
 
     public function deleteCompetitionTeams($competitionId)
     {
-        if ($competitionId == null){
-            return view('admin/error', ['message' => 'Invalid Competition ID.']);
-        }
-
-        $competition = $this->getCompetition($competitionId);
-        if ($competition == null){
-            return view('admin/error', ['message' => 'That competition does not exist.']);
-        }
-
         $delete = Input::get('delete');
 
         if (!empty($delete)) {

@@ -1,6 +1,6 @@
 <?php
 
-use \Illuminate\Support\Facades\Input;
+use \FeddScore\Competition;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,11 +51,23 @@ Route::group(['middleware' => ['web']], function () {
         });
 
         Route::group(['prefix' => 'competition/'], function() {
-            Route::match(['get', 'post'], '{id?}', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
+            Route::match(['get', 'post'], '{id}', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
 
-            Route::post('{id?}/edit', ['as' => 'teams.save', 'uses' => 'AdminController@saveCompetitionTeams']);
-            Route::post('{id?}/add', ['as' => 'teams.add', 'uses' => 'AdminController@addCompetitionTeams']);
-            Route::post('{id?}/delete', ['as' => 'teams.delete', 'uses' => 'AdminController@deleteCompetitionTeams']);
+
+            Route::group(['prefix' => '{id}'], function($id) {
+                if ($id == null){
+                    return view('admin/error', ['message' => 'Invalid Competition ID.']);
+                }
+
+                $competition = Competition::where('id', $id);
+                if ($competition == null){
+                    return view('admin/error', ['message' => 'That competition does not exist.']);
+                }
+
+                Route::post('/edit', ['as' => 'teams.save', 'uses' => 'AdminController@saveCompetitionTeams', $id]);
+                Route::post('/add', ['as' => 'teams.add', 'uses' => 'AdminController@addCompetitionTeams', $id]);
+                Route::post('/delete', ['as' => 'teams.delete', 'uses' => 'AdminController@deleteCompetitionTeams', $id]);
+            });
         });
     });
 });
