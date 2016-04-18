@@ -50,24 +50,21 @@ Route::group(['middleware' => ['web']], function () {
             Route::post('/delete', ['as' => 'competition.delete', 'uses' => 'AdminController@deleteCompetition']);
         });
 
-        Route::group(['prefix' => 'competition/'], function() {
-            Route::match(['get', 'post'], '{id}', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
+        Route::group(['prefix' => 'competition/{id?}'], function($id) {
+            if ($id == null){
+                return view('admin/error', ['message' => 'Invalid Competition ID.']);
+            }
 
+            $competition = Competition::where('id', $id);
+            if ($competition == null){
+                return view('admin/error', ['message' => 'That competition does not exist.']);
+            }
 
-            Route::group(['prefix' => '{id}'], function($id) {
-                if ($id == null){
-                    return view('admin/error', ['message' => 'Invalid Competition ID.']);
-                }
+            Route::match(['get', 'post'], '/', ['as' => 'competition', 'uses' => 'AdminController@showCompetitionTeams']);
 
-                $competition = Competition::where('id', $id);
-                if ($competition == null){
-                    return view('admin/error', ['message' => 'That competition does not exist.']);
-                }
-
-                Route::post('/edit', ['as' => 'teams.save', 'uses' => 'AdminController@saveCompetitionTeams', $id]);
-                Route::post('/add', ['as' => 'teams.add', 'uses' => 'AdminController@addCompetitionTeams', $id]);
-                Route::post('/delete', ['as' => 'teams.delete', 'uses' => 'AdminController@deleteCompetitionTeams', $id]);
-            });
+            Route::post('/edit', ['as' => 'teams.save', 'uses' => 'AdminController@saveCompetitionTeams', $id]);
+            Route::post('/add', ['as' => 'teams.add', 'uses' => 'AdminController@addCompetitionTeams', $id]);
+            Route::post('/delete', ['as' => 'teams.delete', 'uses' => 'AdminController@deleteCompetitionTeams', $id]);
         });
     });
 });
