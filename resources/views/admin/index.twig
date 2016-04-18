@@ -1,4 +1,4 @@
-{% extends "admin/skeleton.html" %}
+{% extends "admin/skeleton" %}
 
 {% block title "Control Panel" %}
 
@@ -6,8 +6,8 @@
 
     <h2>Competitions</h2>
 
-    <form action="" method="POST">
-
+    <form name="competitions" action="" method="POST">
+        {{ csrf_field() }}
         <p class="selectors">
             <strong>Select:</strong>
             {% for class, title in {'compselect': "All", 'notaclass': "None", 'am': "AM", 'pm': "PM", 'waiting': "Waiting", 'active': "Active", 'final': "Final"} %}
@@ -26,12 +26,12 @@
             </thead>
             <tbody>
                 {% for comp in competitions %}
-                <tr{% if edit and edit.id == comp.id %} class="edit"{% endif %}>
-                    <td><input type="checkbox" name="competitions[]" value="{{ comp.id }}" class="compselect {{ comp.ampm }} {{ comp.status }}"></td>
-                    <td><a href="{{ url('competition.php', {id: comp.id}) }}">{{ comp.name }}</a></td>
+                <tr id="comp-{{ comp.id }}"{% if edit and edit.id == comp.id %} class="edit"{% endif %}>
+                    <td><input id="select-{{ comp.id }}" type="checkbox" name="competitions[]" value="{{ comp.id }}" class="compselect {{ comp.ampm }} {{ comp.status }}"></td>
+                    <td><a href="{{ url('competition', {id: comp.id}) }}">{{ comp.name }}</a></td>
                     <td>{{ comp.ampm|upper }}</td>
                     <td>{{ comp.status|title }}</td>
-                    <td>{% if edit and edit.id == comp.id %}Editing Below{% else %}<a href="?edit={{ comp.id }}">Edit</a>{% endif %}</td>
+                    <td>{% if edit and edit.id == comp.id %}Editing Below{% else %}<a href="{{ route('admin') }}?edit={{ comp.id }}">Edit</a>{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -39,29 +39,29 @@
 
         <p class="buttons">
             <strong>With Selected:</strong>
-            <button type="submit" name="action" value="waiting">Mark Waiting</button>
-            <button type="submit" name="action" value="active">Mark Active</button>
-            <button type="submit" name="action" value="final">Mark Final</button>
-            <button type="submit" name="action" value="delete" onclick="return confirm('Do you really want to delete the checked competitions?');">Delete</button>
+            <button type="submit" name="action" value="waiting" formaction="{{ route('competition.edit') }}">Mark Waiting</button>
+            <button type="submit" name="action" value="active" formaction="{{ route('competition.edit') }}">Mark Active</button>
+            <button type="submit" name="action" value="final" formaction="{{ route('competition.edit') }}">Mark Final</button>
+            <button type="submit" name="action" value="delete" formaction="{{ route('competition.delete') }}" onclick="return confirm('Do you really want to delete the checked competitions?');">Delete</button>
         </p>
 
     </form>
 
-    <form action="?" method="POST" class="box {{ edit ? 'edit' : 'add' }}">
-
+    <form action="" method="POST" class="box {{ edit ? 'edit' : 'add' }}">
+        {{ csrf_field() }}
         <h2>{{ edit ? "Edit" : "Add" }} Competition</h2>
 
         <p>
             <strong>Name:</strong>
-            <input name="name" type="text" value="{{ edit.name }}" autofocus>
+            <input id="name" name="name" type="text" value="{{ edit.name }}" autofocus>
 
             <label>
-                <input name="ampm" type="radio" value="am"
+                <input id="am" name="ampm" type="radio" value="am"
                        {% if not edit or edit.ampm == "am" %} checked{% endif %}>
                 AM
             </label>
             <label>
-                <input name="ampm" type="radio" value="pm"
+                <input id="pm" name="ampm" type="radio" value="pm"
                        {% if edit.ampm == "pm" %} checked{% endif %}>
                 PM
             </label>
@@ -70,12 +70,12 @@
         <p>
             {% if edit %}
             <input type="hidden" name="original" value="{{ edit.id }}">
-            <button type="submit" name="action" value="edit">Save</button>
-            <button type="submit" name="action" value="add">Save as New</button>
-            <a href="?">Cancel</button>
+            <button type="submit" name="action" value="edit" formaction="{{ route('competition.rename') }}">Save</button>
+            <button type="submit" name="action" value="add" formaction="{{ route('competition.add') }}">Save as New</button>
+            <button formaction="{{ route('admin') }}">Cancel</button>
             {% else %}
             <input type="hidden" name="action" value="add">
-            <button type="submit">Add</button>
+            <button type="submit" formaction="{{ route('competition.add') }}">Add</button>
             {% endif %}
         </p>
     

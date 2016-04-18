@@ -1,4 +1,4 @@
-{% extends "skeleton.html" %}
+{% extends "skeleton" %}
 
 {% block header "FEDD Control Panel" %}
 
@@ -9,11 +9,11 @@
 {% block body %}
 
     <p class="admin-nav">
-        <a href="/academics/undergrad/firstyear/scoreboard/">&laquo; Back to Scoreboard</a> |
-        <a href="/academics/undergrad/firstyear/scoreboard/admin/">Control Panel Home</a>
+        <a href="{{ route('dashboard') }}">&laquo; Back to Scoreboard</a> |
+        <a href="{{ route('admin') }}">Control Panel Home</a>
     </p>
 
-    {% for flash in getFlashes() %}
+    {% for flash in messages %}
     <div class="flash {{ flash.type }}">{{ flash.message|raw }}</div>
     {% endfor %}
 
