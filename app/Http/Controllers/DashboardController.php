@@ -6,6 +6,7 @@ use FeddScore\Competition;
 use FeddScore\DesignDay;
 use FeddScore\Http\Requests;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -110,11 +111,17 @@ class DashboardController extends Controller
             ->orderBy('ampm', 'asc')
             ->orderBy('name', 'asc')
             ->get();
+        $years = DB::table('competitions')
+            ->select('year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->get();
 
         return view('scoreboard/final-scores', [
             'year' => $year-1,
             'collapse' => true,
-            'competitions' => $competitions
+            'competitions' => $competitions,
+            'years' => $years
         ]);
     }
 
