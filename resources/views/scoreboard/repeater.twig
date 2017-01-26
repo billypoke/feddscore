@@ -4,40 +4,93 @@
 {% block title "Live Scores" %}
 
 {% block scripts %}
-    {% if not mobile and autoreload %}
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <script src="public/js/jquery.cycle.all.js"></script>
-        <script>
-            $(function () {
-                {% if competitions|length < 2 %}
-                setTimeout(function () { location.reload(); }, 10000);
-                {% else %}
-                $("#competitions").cycle({
-                    fx:         'fade',
-                    timeout:    10000,
-                    sync:       false,
-                    autostop:   true,
-                    end:        function () { location.reload(); }
-                });
-                {% endif %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="{{ asset('public/js/jquery.cycle2.js') }}"></script>
+    <script src="{{ asset('public/js/jquery.cycle2.center.js') }}"></script>
+    <script src="{{ asset('public/js/jquery.cycle2.swipe.js') }}"></script>
+    <script type="text/javascript">
+
+        /**
+         * Fetch updated scores on slideshow finish, then replace current scores and restart slideshow
+         */
+        $('#competitions').on('cycle-finished', function () {
+            $.get("{{ route('dashboard.repeater', {'year' : year}) }}", function (data) {
+                var competitions = $(data).find('#competitions').children();
+
+                $('#competitions').html(competitions)
+                    .cycle('reinit');
             });
-        </script>
-    {% endif %}
+        });
+
+        /**
+         * Deal with control clicks
+         */
+        $(function () {
+            $('#showControls').click(function () {
+                $('#showControls').toggle();
+                $('#instructions').toggle();
+                $('#controls').toggle();
+            });
+
+            $('#hideControls').click(function () {
+                $('#showControls').toggle();
+                $('#instructions').toggle();
+                $('#controls').toggle();
+            });
+
+            $('#prev').click(function () {
+                $('#competitions').cycle('pause');
+            });
+            $('#next').click(function () {
+                $('#competitions').cycle('resume');
+            });
+        })
+    </script>
 {% endblock scripts %}
 
 {% block body %}
 
     <p id="date">Live Scores for Fall {{ year }}</p>
 
-    <div id="competitions">
-        {% for competition in competitions %}
-        {{ competitiondiv(competition) }}
-        {% else %}
+    {% if (competitions|length < 2) %}
         <div class="announcement">
             Welcome to FEDD!
         </div>
-        {% endfor %}
-    </div>
+    {% else %}
+
+        <!-- cycle2 configuration options -->
+        <div id="competitions" class="cycle-slideshow"
+             data-cycle-slides="> div"
+             data-cycle-fx="fade"
+             data-cycle-swipe="true"
+             data-cycle-timeout="10000"
+             data-cycle-auto-height="container"
+             data-cycle-loop="1"
+             data-cycle-sync="false"
+             data-cycle-center-horz=true
+             data-cycle-prev="#prev"
+             data-cycle-next="#next"
+        >
+            {% for competition in competitions %}
+                {{ competitiondiv(competition) }}
+            {% endfor %}
+        </div>
+
+        <div id="controls" class="center">
+            <a href="#" id="prev"><< Prev</a> |
+            <a href="#" id="next">Next >></a>
+        </div>
+        <a id="showControls" href="#">Show Controls</a>
+        <div id="instructions">
+            <a id="hideControls" href="#">Hide Controls</a>
+            <p>
+                Event will auto-advance every 10 seconds, or you can use the buttons or swipe left/right to manually
+                change event. Going back in the slideshow will PAUSE the auto-advance feature until you click the next
+                button.
+            </p>
+        </div>
+
+    {% endif %}
 
 {% endblock body %}
 
