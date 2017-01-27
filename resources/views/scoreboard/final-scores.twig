@@ -23,11 +23,29 @@
             };
         </script>
     {% endif %}
+
+    <script type="text/javascript">
+        $(function() {
+            $("#yearSelect").val("{{ year }}").change(function() {
+                var selected = parseInt(this.value) + 1;
+                $("#yearSelectForm").attr("action", "{{ route('dashboard') }}/" + selected + "/hall-of-fame").submit();
+            });
+        });
+    </script>
 {% endblock scripts %}
 
 {% block body %}
-
-    <p id="date">Final Scores for Fall {{ year }}</p>
+    {% if not year %}
+        {% set year = "now"|date('y') %}
+    {% endif %}
+    <form id="yearSelectForm" action="{{ route('dashboard.hof', year + 1) }}">
+        <label for="yearSelect">Final Scores for: </label>
+        <select id="yearSelect">
+            {% for yearDistinct in years %}
+                <option value="{{ yearDistinct.year }}">Fall {{ yearDistinct.year }}</option>
+            {% endfor %}
+        </select>
+    </form>
 
     <div id="competitions">
         {% for competition in competitions %}
