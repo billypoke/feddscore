@@ -41,7 +41,7 @@ $factory->defineAs(FeddScore\Competition::class, 'waiting', function (Faker\Gene
 $factory->define(FeddScore\Team::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->company,
-        'score' => random_int(0,10),
+        'score' => random_int(0,100),
         'place' => null,
         'disqualified' => 0
     ];
