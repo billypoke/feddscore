@@ -1,7 +1,7 @@
 {% macro competitiondiv (competition, collapse) %}
     <div class="competition" id="competition-{{ competition.id }}">
 
-        <h2>{{ competition.name }} &ndash; {{ competition.ampm == "am" ? "Morning" : "Afternoon" }}</h2>
+        <h2 class="competitionName">{{ competition.name }} &ndash; {{ competition.ampm == "am" ? "Morning" : "Afternoon" }}</h2>
 
         <table class="scores">
             <tbody>

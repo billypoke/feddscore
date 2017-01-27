@@ -17,6 +17,22 @@ body
     text-align: center;
 }
 
+#competitions {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.competition {
+    padding: 5px;
+}
+.competitionName, .center {
+    text-align: center;
+}
+
+#instructions, #controls {
+    display: none;
+}
+
 h1
 {
     font-weight: normal;
