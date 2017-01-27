@@ -1,0 +1,18 @@
+{% extends "skeleton" %}
+
+{% block header %} <h1>403 Forbidden</h1> {% endblock header %}
+{% block body %}
+    <img src="{{ asset('public/img/HAL9000.jpg') }}" id="hal">
+    <div>
+        <div id="forbiddenDiv">
+            <h1 id="quote"><em><code>I'm sorry Dave, I'm afraid I can't do that</code></em></h1>
+        </div>
+        <div id="returnDiv">
+            <p id="returnLink">You are not authorized to access this area of the site. Please
+                <em><a href="{{ route('dashboard') }}">return to the scoreboard</a></em>
+                before Hal notices what you doing.
+            </p>
+        </div>
+    </div>
+    <div class="forbiddenClear"></div>
+{% endblock body %}

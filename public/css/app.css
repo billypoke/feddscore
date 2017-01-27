@@ -173,3 +173,47 @@ span.gr
     text-align: center;
 }
 
+#hal {
+    max-width: 25%;
+    float: left;
+}
+
+#quote {
+    margin: 0;
+}
+
+#forbiddenDiv {
+    float: right;
+    padding: 2.5%;
+}
+
+#returnDiv {
+    float: right;
+    padding: 2.5%;
+    clear: right;
+}
+
+@media (min-width: 500px) {
+    #forbiddenDiv {
+        max-width: 70%;
+    }
+
+    #returnDiv {
+        max-width: 70%;
+    }
+}
+
+@media (max-width: 500px) {
+    #hal {
+        width: 100px;
+    }
+
+    #forbiddenDiv {
+        /*          fill - hal - content padding - span padding  */
+        width: calc(100% - 100px - 5%);
+    }
+}
+
+.forbiddenClear {
+    clear: both;
+}
