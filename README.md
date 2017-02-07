@@ -63,7 +63,7 @@ $ php artisan key:generate
 * If a rollback fails after changing a migration, run `composer dump-autoload`
 to refresh the classes in the autoloader
 
-
+## Fix ini_set() issues
 Currently, a find/sed command is required to deploy the application into
 the web environment. This command goes through the vendor folder and prepends
 any ini_set command with @ to suppress errors in PHP configurations that
@@ -75,11 +75,14 @@ $ find ./vendor -type f -exec sed -i 's/@*ini_set/@ini_set/g' {} \;
 $ find ./bootstrap -type f -exec sed -i 's/@*ini_set/@ini_set/g' {} \;
 ```
 
-** After completing the previous steps, please note that in development,
+## URL Routing
+
+After completing the previous steps, please note that in development,
 you must specify the url path by using:
 ```bash
 $ php artisan route:list
 ```
+
 * For example, using `...feddscore/` or `..feddscore/index.php/` will *not* work
 and will result in some sort of an error.
 * However, using `...feddscore/index.php/admin` or `...feddscore/index.php/dashboard` will work.
