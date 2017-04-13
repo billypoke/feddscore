@@ -4,9 +4,9 @@
 {% block title "Final Scores" %}
 
 {% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     {% if collapse %}
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <script>
+        <script type="text/javascript">
             $(function () {
                 $('.nonplacers').hide();
                 $('.show-link').show();
@@ -27,8 +27,8 @@
     <script type="text/javascript">
         $(function() {
             $("#yearSelect").val("{{ year }}").change(function() {
-                var selected = parseInt(this.value) + 1;
-                $("#yearSelectForm").attr("action", "{{ route('dashboard') }}/" + selected + "/hall-of-fame").submit();
+                var selected = parseInt(this.value);
+                $("#yearSelectForm").attr("action", "{{ route('dashboard') }}/" + selected + {{ collapse ? "'/hall-of-fame'" : "'/final'" }}).submit();
             });
         });
     </script>
@@ -38,8 +38,14 @@
     {% if not year %}
         {% set year = "now"|date('y') %}
     {% endif %}
-    <form id="yearSelectForm" action="{{ route('dashboard.hof', year + 1) }}">
-        <label for="yearSelect">Final Scores for: </label>
+    <form id="yearSelectForm" action="{{ route('dashboard.hof', year) }}">
+        <label for="yearSelect">
+            {% if collapse %}
+                Hall of Fame for:
+            {% else %}
+                Final Scores for:
+            {% endif %}
+        </label>
         <select id="yearSelect">
             {% for yearDistinct in years %}
                 <option value="{{ yearDistinct.year }}">Fall {{ yearDistinct.year }}</option>

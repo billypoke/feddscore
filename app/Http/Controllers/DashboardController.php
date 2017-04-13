@@ -90,11 +90,17 @@ class DashboardController extends Controller
             ->orderBy('ampm', 'asc')
             ->orderBy('name', 'asc')
             ->get();
+        $years = DB::table('competitions')
+            ->select('year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->get();
 
         return view('scoreboard/final-scores', [
             'year' => $year,
             'collapse' => false,
-            'competitions' => $competitions
+            'competitions' => $competitions,
+            'years' => $years
         ]);
     }
 
@@ -106,7 +112,7 @@ class DashboardController extends Controller
      */
     public function getHallOfFame($year)
     {
-        $competitions = Competition::where('year', $year-1)
+        $competitions = Competition::where('year', $year)
             ->where('status', 'final')
             ->orderBy('ampm', 'asc')
             ->orderBy('name', 'asc')
@@ -118,7 +124,7 @@ class DashboardController extends Controller
             ->get();
 
         return view('scoreboard/final-scores', [
-            'year' => $year-1,
+            'year' => $year,
             'collapse' => true,
             'competitions' => $competitions,
             'years' => $years

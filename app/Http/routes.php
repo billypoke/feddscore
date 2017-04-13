@@ -26,6 +26,9 @@ use \FeddScore\Competition;
 
 Route::group(['middleware' => ['web']], function () {
 
+    Route::get('/', function () {
+        return redirect()->route('dashboard.advert', ['year' => date("Y")]);
+    });
 
     Route::group(['prefix' => 'dashboard/{year?}'], function() {
         Route::get('/', [
