@@ -44,7 +44,7 @@ class DashboardController extends Controller
                 return $this->getAdvert($year);
             }
         } else {
-            return $this->getHallOfFame($year);
+            return $this->getHallOfFame($year - 1);
         }
     }
 

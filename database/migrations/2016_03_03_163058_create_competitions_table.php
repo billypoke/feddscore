@@ -26,13 +26,13 @@ class CreateCompetitionsTable extends Migration
 
         // then create tables
         $schema->create('competitions', function (ExtendedBlueprint $table) {
-        $table->engine = 'InnoDB';
-        $table->increments('id');
-        $table->year('year');
-        $table->enum('ampm', array('am', 'pm'));
-        $table->string('name');
-        $table->enum('status', array('waiting', 'active', 'final'));
-    });
+            $table->engine = 'InnoDB';
+            $table->increments('id');
+            $table->year('year');
+            $table->enum('ampm', array('am', 'pm'));
+            $table->string('name');
+            $table->enum('status', array('waiting', 'active', 'final'));
+        });
     }
 
     /**

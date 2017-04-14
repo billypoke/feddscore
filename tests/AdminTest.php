@@ -13,15 +13,16 @@ class AdminTest extends TestCase
     /** @test */
     public function it_can_create_competitions()
     {
+        $name = 'Competition Name';
         $input = [
-            'name' => 'Competition Name',
+            'name' => $name,
             'ampm' => 'am'
         ];
         $this->visit('admin')
-            ->dontSee('Competition Name');
+            ->dontSee($name);
         $this->call('POST', 'admin/add', $input);
         $this->seePageIs('admin/add')
-            ->see('Competition Name');
+            ->see($name);
     }
 
     /** @test */
@@ -35,6 +36,7 @@ class AdminTest extends TestCase
         ];
 
         $this->visit('admin')
+            ->see($competition->name)
             ->click('Edit')
             ->seeElement('.edit')
             ->see('Editing Below')

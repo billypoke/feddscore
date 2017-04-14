@@ -14,7 +14,7 @@
 $factory->defineAs(FeddScore\Competition::class, 'active', function (Faker\Generator $faker) {
     return [
         'name' => $faker->company,
-        'year' => '2016',
+        'year' => date("Y"),
         'ampm' => 'am',
         'status' => 'active'
     ];
@@ -23,7 +23,7 @@ $factory->defineAs(FeddScore\Competition::class, 'active', function (Faker\Gener
 $factory->defineAs(FeddScore\Competition::class, 'final', function (Faker\Generator $faker) {
     return [
         'name' => $faker->company,
-        'year' => '2016',
+        'year' => date("Y"),
         'ampm' => 'am',
         'status' => 'final'
     ];
@@ -32,7 +32,7 @@ $factory->defineAs(FeddScore\Competition::class, 'final', function (Faker\Genera
 $factory->defineAs(FeddScore\Competition::class, 'waiting', function (Faker\Generator $faker) {
     return [
         'name' => $faker->company,
-        'year' => '2016',
+        'year' => date("Y"),
         'ampm' => 'am',
         'status' => 'waiting'
     ];
