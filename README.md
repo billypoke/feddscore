@@ -8,28 +8,21 @@ Manage and display a rotating scoreboard for Freshman Engineering Design Day
 * `/dashboard` is the default route and determines the page to show based on the internal state of the application. The
     function `DashboardController@getCurrent` does the following when determining which page to show
 
-    * If the current year has competitions in it, then the page shown is based on the current date
-        * If Design Day is currently happening, the repeater is shown
-        * If Design Day has yet to happen, the advertisement is shown
-        * If Design Day has already happened, the final scores are shown
-    * If the current year does NOT have competitions, the hall of fame page is shown
+    * If the current year has competitions in it, then the page shown is:
+        * If today is Design Day, the repeater is shown
+        * If Design Day has not occured this year, the advertisement is shown
+        * If Design Day has occured this year, the final scores are shown
+    * If the current year does NOT have competitions, the hall of fame page from the previous year is shown
 
 * `/dashboard/{year}/blah` will override this behavior to show a specific view, where `blah` is one of:
-    * `advert`: show the advertisement for the current year
-    * `repeater`: show the repeater for the provided year. NOTE: Will only show competitions that are `active`
-    * `final`: show the final scores for the provided year
-    * `hall-of-fame`: hide the non-placing scores with a css/jquery expander
-
-    NOTE: `advert` and `repeater` are less useful outside the current year, since `advert` ignores the provided year and
-    `repeater` only shows `active` competitions, and the `admin` page only edits the current year's competitions. This
-    means that database edits would be required to show a previous year's repeater after the fact.
+    * `advert`: show the advertisement for the CURRENT year
+    * `hall-of-fame`: show the placing scores for the PROVIDED year
+    * `final`: show all scores for the PROVIDED year
 
 * `/admin` is the administrative interface for adding, removing, and editing teams and competitions for the current year
-    * NOTE: This route is protected by Shibboleth, but there is currently no access list for it
 
 * `/competition/{id}` is the page that show when editing a competition, it should not be accessed directly, but through
     the `/admin` route above
-    * NOTE: This route is also protected by Shibboleth, with the same caveat
 
 ## Install
 
@@ -53,7 +46,7 @@ Then add PHP 5.6
 $ add php56
 ```
 
-Via Composer. Install dependencies, 
+Via Composer. Install dependencies,
 ``` bash
 $ composer install
 ```
@@ -100,7 +93,7 @@ any ini_set command with @ to suppress errors in PHP configurations that
 disallow the use of ini_set. It's not included as a post-update or
 post-install command for composer because composer is not given enough
 time to run the command due to environment restrictions on execution time.
-```bash                                                         
+```bash
 $ find ./vendor -type f -exec sed -i 's/@*ini_set/@ini_set/g' {} \;
 $ find ./bootstrap -type f -exec sed -i 's/@*ini_set/@ini_set/g' {} \;
 ```
@@ -112,10 +105,6 @@ you must specify the url path by using:
 ```bash
 $ php artisan route:list
 ```
-
-* For example, using `...feddscore/` or `..feddscore/index.php/` will *not* work
-and will result in some sort of an error.
-* However, using `...feddscore/index.php/admin` or `...feddscore/index.php/dashboard` will work.
 
 ## Testing
 
