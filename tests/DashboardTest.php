@@ -13,8 +13,8 @@ class DashboardTest extends TestCase
         $this->todayIs($this->getBaseDate()." -1 week");
         $this->createSomeFakeCompetitions('waiting');
         
-        $this->visit('dashboard/'.date("Y").'/advert')
-            ->see('Freshman Engineering Design Day');
+        $this->visit('dashboard/')
+            ->see('will be held on');
     }
 
     /** @test */
